@@ -24,9 +24,10 @@ function M.get(buf)
       end
       for _, candidate in ipairs(candidates) do
         if type(candidate) == "string" then
-          candidate = normalize(candidate):gsub("/$", "")
+          candidate = normalize(candidate)
           -- Match a directory boundary: /work/app must not match /work/apple.
-          if path == candidate or path:sub(1, #candidate + 1) == candidate .. "/" then
+          local prefix = candidate:sub(-1) == "/" and candidate or candidate .. "/"
+          if path == candidate or path:sub(1, #prefix) == prefix then
             roots[#roots + 1] = candidate
           end
         end

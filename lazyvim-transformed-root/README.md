@@ -79,6 +79,8 @@ These are explicit network and compiler operations. Missing parsers leave native
 
 The default configuration was started with Neovim 0.12.6 against read-only, already installed plugin sources. The verification redirected standard config, data, state, cache, and log paths into ignored `no-sync/`, substituted package installation, and prevented external LSP processes from starting. It exercised actual plugin setup, Lua filetype handling, native LSP configuration and Blink capabilities, and the absence of Lazy management mappings. All Lua modules are checked for syntax.
 
+Focused checks also cover containing-workspace boundaries (including `/`), global versus buffer autoformat overrides, per-buffer lint debouncing, folding state when switching between LSP and Tree-sitter buffers in the same window, and the missing-parser guard that prevents Kulala setup from starting a build. Another isolated check resolves 27 optional configuration modules through native server definitions without launching their commands.
+
 This verifies configuration against those installed plugin versions. Optional plugins, external language servers, debug adapters, project test runners, parser compilation, and fresh network installations require their documented dependencies and have not all been run. See [MIGRATION.md](MIGRATION.md) for behavioral changes and conflicts.
 
 ## Sources and license

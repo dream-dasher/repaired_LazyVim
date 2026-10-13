@@ -162,8 +162,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end
     if client:supports_method("textDocument/foldingRange", buf) then
       for _, win in ipairs(vim.fn.win_findbuf(buf)) do
-        vim.wo[win].foldmethod = "expr"
-        vim.wo[win].foldexpr = "v:lua.vim.lsp.foldexpr()"
+        vim.wo[win][0].foldmethod = "expr"
+        vim.wo[win][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
       end
     end
     -- Automatic refresh is disabled; these maps explicitly run or refresh supported lenses.

@@ -42,9 +42,9 @@ local function attach(buf)
   end
   if query("folds") then
     for _, win in ipairs(vim.fn.win_findbuf(buf)) do
-      if vim.wo[win].foldexpr ~= "v:lua.vim.lsp.foldexpr()" then
-        vim.wo[win].foldmethod = "expr"
-        vim.wo[win].foldexpr = "v:lua.vim.treesitter.foldexpr()"
+      if vim.wo[win][0].foldexpr ~= "v:lua.vim.lsp.foldexpr()" then
+        vim.wo[win][0].foldmethod = "expr"
+        vim.wo[win][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
       end
     end
   end
