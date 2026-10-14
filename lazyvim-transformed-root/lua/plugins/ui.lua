@@ -3,6 +3,8 @@
 -- Plugin dependencies: akinsho/bufferline.nvim, nvim-lualine/lualine.nvim,
 -- folke/noice.nvim, MunifTanjim/nui.nvim; mini.icons, Snacks, Gitsigns and Trouble
 -- are configured by earlier modules. Manual builds: none.
+-- Load after core LSP and optional editor modules, before optional UI/AI integrations.
+-- Aerial/Navic components must be available before the Lualine setup below discovers them.
 -- Docs: https://github.com/akinsho/bufferline.nvim#configuration
 -- https://github.com/nvim-lualine/lualine.nvim#usage-and-customization
 -- https://github.com/folke/noice.nvim#configuration

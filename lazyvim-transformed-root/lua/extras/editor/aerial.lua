@@ -1,9 +1,11 @@
 -- Dependencies: Neovim 0.12.6; Git for vim.pack; aerial.nvim; LSP with documentSymbol support or installed Tree-sitter parsers.
 -- Docs: https://github.com/stevearc/aerial.nvim
 -- Enable: require("extras.editor.aerial") in init.lua.
--- Load after plugins/editor.lua and config/keymaps.lua; replaces Trouble's <leader>cs.
+-- Load after plugins/editor.lua and config/keymaps.lua, BEFORE plugins/ui.lua;
+-- init.lua already places this call there. Replaces Trouble's <leader>cs.
 -- Conflicts: outline.nvim also owns <leader>cs; choose one symbol sidebar.
 -- Optional lualine: directly add {'aerial', sep=' ', depth=5} to plugins/ui.lua lualine_c.
+-- Keep this module before plugins.ui: Lualine discovers Aerial's component during setup.
 -- Optional Edgy: directly add {title='Aerial',ft='aerial',pinned=true,open='AerialOpen'} to extras/ui/edgy.lua right.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 

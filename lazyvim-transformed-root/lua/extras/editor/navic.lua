@@ -1,7 +1,9 @@
 -- Dependencies: Neovim 0.12.6; Git for vim.pack; nvim-navic; LSP with documentSymbol support; optional lualine already in plugins/ui.lua.
 -- Docs: https://github.com/SmiteshP/nvim-navic
 -- Enable: require("extras.editor.navic") in init.lua.
--- Load after plugins/lsp.lua. Directly add {'navic',color_correction='dynamic'} to lualine_c in plugins/ui.lua.
+-- Load AFTER plugins/lsp.lua and BEFORE plugins/ui.lua; init.lua already places this call there.
+-- Optional lualine: directly add {'navic',color_correction='dynamic'} to lualine_c in plugins/ui.lua.
+-- Keep this module before plugins.ui: Lualine discovers Navic's component during setup.
 -- Conflicts: symbol breadcrumbs from Trouble/Aerial can duplicate Navic in lualine; choose one component.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 

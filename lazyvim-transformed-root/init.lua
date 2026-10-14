@@ -41,7 +41,6 @@ require("plugins.treesitter") -- TS main/textobjects/autotag; MANUAL parser inst
 --   markdown_inline printf python query regex toml tsx typescript vim vimdoc xml yaml
 -- Needs curl, tar, C compiler and tree-sitter >= 0.26.1; after plugin updates run :TSUpdate.
 require("plugins.editor") -- Flash/WhichKey/Gitsigns/GrugFar/Trouble/Todo; git and rg.
-require("plugins.ui") -- Bufferline/Lualine/Noice + nui; no external tools.
 require("plugins.formatting") -- Conform; stylua, shfmt, fish_indent on PATH.
 require("plugins.linting") -- nvim-lint; fish on PATH for Fish buffers.
 -- Optional project JSON layering; only use with an explicit native before_init hook.
@@ -85,6 +84,8 @@ require("plugins.persistence") -- Persistence; writes sessions in Neovim's state
 -- require("extras.coding.yanky")
 
 -- Optional editor configurations and alternatives.
+-- These run after the core LSP/mapping setup and before plugins.ui below.
+-- In particular, Aerial/Navic must be available when Lualine discovers its components.
 -- Dependencies: Neovim 0.12.6; Git for vim.pack; aerial.nvim; LSP with documentSymbol support or installed Tree-sitter parsers.
 -- require("extras.editor.aerial")
 
@@ -138,6 +139,11 @@ require("plugins.persistence") -- Persistence; writes sessions in Neovim's state
 
 -- Dependencies: Neovim 0.12.6; Git for vim.pack; telescope.nvim; plenary.nvim; dressing.nvim; rg; fd optional. Optional telescope-fzf-native needs make/C compiler.
 -- require("extras.editor.telescope")
+
+-- Configure the UI after optional symbol providers have loaded. Lualine resolves
+-- component modules during setup; providers loaded afterward can leave empty breadcrumbs.
+-- To display Aerial/Navic, also add the component described in its module header to lualine_c.
+require("plugins.ui") -- Bufferline/Lualine/Noice + nui; no external tools.
 
 -- Optional ui configurations and alternatives.
 -- Dependencies: Neovim 0.12.6; Git for vim.pack; alpha-nvim; default Snacks picker and persistence modules; rg/fd for search.

@@ -6,6 +6,8 @@ This directory is a complete Neovim 0.12.6 configuration derived from LazyVim 16
 
 Read `init.lua` first. Its ordered `require` calls are the entire configuration entry point. Every module lists its plugin and executable dependencies at the top, with a shorter reminder beside its call in `init.lua`.
 
+Core LSP and optional editor modules run before `plugins.ui`. This lets Lualine discover optional Aerial/Navic components during setup. To display either provider, uncomment its existing call and add the component documented in its module header to `plugins/ui.lua`; keep the provider before the UI call.
+
 The local `stylua.toml` disables require sorting so formatting preserves this startup order.
 
 `lua/config/` contains options, mappings, autocmds, and icon data. `lua/plugins/` configures the default plugins. `lua/extras/` contains optional configurations and alternatives. `lua/util/` contains small project-root and formatting helpers. `queries/lua/highlights.scm` extends native Lua highlighting to recognize `vim` as a builtin namespace.
@@ -82,6 +84,8 @@ The default configuration was started with Neovim 0.12.6 against read-only, alre
 Focused checks also cover containing-workspace boundaries (including `/`), global versus buffer autoformat overrides, per-buffer lint debouncing, folding state when switching between LSP and Tree-sitter buffers in the same window, and the missing-parser guard that prevents Kulala setup from starting a build. Another isolated check resolves 27 optional configuration modules through native server definitions without launching their commands.
 
 Native first-install confirmation is checked with a status-column redraw before Snacks exists and installation declined. The startup check also renders the column before each plugin addition and verifies that Snacks enables its renderer after setup.
+
+Additional isolated startup runs enable Aerial and Navic separately with their documented Lualine components and verify that Lualine selects each plugin's actual renderer. Replaying the previous UI call position reproduces the missing-renderer fallback. These checks use real plugin sources while substituting package installation and preventing external LSP startup.
 
 This verifies configuration against those installed plugin versions. Optional plugins, external language servers, debug adapters, project test runners, parser compilation, and fresh network installations require their documented dependencies and have not all been run. See [MIGRATION.md](MIGRATION.md) for behavioral changes and conflicts.
 
