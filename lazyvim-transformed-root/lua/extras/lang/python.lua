@@ -1,8 +1,9 @@
--- Dependencies: python3; pyright-langserver (npm pyright, needs node); ruff (pip/uv ruff); fd for venv discovery; optional debugpy-adapter (pip debugpy).
+-- Dependencies: python3; ty and ruff installed globally on PATH; fd for venv discovery; optional debugpy-adapter (pip debugpy).
 -- Config modules: plugins.lsp (nvim-lspconfig + Blink), plugins.formatting (conform.nvim).
 -- Plugins: linux-cultist/venv-selector.nvim; optional mfussenegger/nvim-dap-python; https://github.com/linux-cultist/venv-selector.nvim
 -- Parsers (install manually): python, ninja, rst.
 -- LSP definitions / executable details: https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.txt
+-- Python servers: https://docs.astral.sh/ty/editors/ and https://docs.astral.sh/ruff/editors/setup/
 -- Parser installation: https://github.com/nvim-treesitter/nvim-treesitter#installation
 -- Enable extras.formatting.black AFTER this module to replace Ruff formatting with Black.
 -- Ruff still supplies lint fixes/code actions; avoid enabling a second Ruff lint client.
@@ -12,19 +13,21 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
--- Pair Pyright navigation/type analysis with Ruff lint fixes and code actions.
-vim.lsp.config("pyright", {})
+-- Pair ty navigation/type analysis with Ruff lint fixes and code actions.
+-- Invoke the global PATH executables directly; no uv run or project-local wrapper.
+vim.lsp.config("ty", { cmd = { "ty", "server" } })
 vim.lsp.config("ruff", {
+  cmd = { "ruff", "server" },
   cmd_env = { RUFF_TRACE = "messages" },
   init_options = { settings = { logLevel = "error" } },
-  -- Let Pyright answer hover requests to avoid competing Ruff responses.
+  -- Let ty answer hover requests to avoid competing Ruff responses.
   on_attach = function(client)
     client.server_capabilities.hoverProvider = false
   end,
 })
-vim.lsp.enable({ "pyright", "ruff" })
--- Alternative: replace pyright with basedpyright (pip basedpyright; basedpyright-langserver).
--- Use either pyright or basedpyright; use the native Ruff server rather than deprecated ruff-lsp.
+vim.lsp.enable({ "ty", "ruff" })
+-- Alternatives: replace ty's config and enable entry with pyright or basedpyright.
+-- Keep one type-checking/navigation server and native Ruff, rather than deprecated ruff-lsp.
 -- Load virtual-environment selection with activation notifications enabled.
 vim.pack.add({ { src = "https://github.com/linux-cultist/venv-selector.nvim" } })
 require("venv-selector").setup({ options = {

@@ -57,7 +57,7 @@ Most alternatives share mappings or UI responsibilities. Read the module header 
 | Symbol outline | Trouble symbols, Aerial, Outline, or Navic/lualine integrations; several use `<leader>cs` |
 | AI completion | Native Copilot versus copilot.lua; decide provider mappings and Blink sources directly |
 | TypeScript | vtsls or the tsc alternative; avoid simultaneous ts_ls/vtsls/TypeScript-owned clients |
-| Python | pyright or basedpyright; use Ruff's native server rather than also enabling ruff_lsp; Ruff hover yields to the type checker |
+| Python | Enabled with global ty and Ruff; Pyright/basedpyright can replace ty; use Ruff's native server rather than also enabling ruff_lsp; Ruff hover yields to the type checker |
 | Ruby | Solargraph's Rubocop integration can duplicate a separate Rubocop LSP client's diagnostics |
 | Formatting | Conform, none-ls, Biome, Prettier, Oxfmt, and ESLint need explicit ownership per filetype; later optional assignments replace earlier ones |
 | Language-owned LSP | Java/jdtls, Rustaceanvim, Haskell Tools, Lean, and Metals own their startup; do not also enable a second generic client |

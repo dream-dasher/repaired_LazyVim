@@ -1,6 +1,7 @@
 -- Dependencies: Neovim >= 0.12.6; git for native vim.pack plugin installation.
 -- Default external tools: rg, lua-language-server, stylua; fd recommended; shfmt and fish for their filetypes.
 -- Rust: rustc, cargo, and rust-analyzer on PATH; automatic checks/build scripts/proc macros enabled.
+-- Python: python3, global ty and ruff on PATH; fd for virtual-environment discovery.
 -- Optional: lazygit, gh, a clipboard provider and a Nerd Font.
 -- Manual Tree-sitter builds: curl, tar, a C compiler and tree-sitter CLI >= 0.26.1.
 -- Each module repeats its dependencies; optional modules below are ordinary commented calls.
@@ -385,10 +386,10 @@ require("plugins.ui") -- Bufferline/Lualine/Noice + nui; no external tools.
 -- Parsers (install manually): prisma.
 -- require("extras.lang.prisma")
 
--- Dependencies: python3; pyright-langserver (npm pyright, needs node); ruff (pip/uv ruff); fd for venv discovery; optional debugpy-adapter (pip debugpy).
+-- Dependencies: python3; ty and ruff installed globally on PATH; fd for venv discovery; optional debugpy-adapter (pip debugpy).
 -- Plugins: linux-cultist/venv-selector.nvim; optional mfussenegger/nvim-dap-python; https://github.com/linux-cultist/venv-selector.nvim
 -- Parsers (install manually): python, ninja, rst.
--- require("extras.lang.python")
+require("extras.lang.python")
 
 -- Dependencies: R; R package languageserver (manual install.packages("languageserver")).
 -- Parsers (install manually): r, rnoweb, csv, markdown, markdown_inline, latex, yaml.

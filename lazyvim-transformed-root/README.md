@@ -26,6 +26,7 @@ Install these yourself; this configuration does not install language servers, fo
 | `fd` | Recommended file finder; optional features may require it explicitly |
 | `lua-language-server` | Default Lua LSP server |
 | `rustc`, `cargo`, `rust-analyzer` | Enabled Rust support through Rustaceanvim; install rust-analyzer with `rustup component add rust-analyzer` |
+| `python3`, global `ty` and `ruff` | Enabled Python support: ty navigation/type checking; Ruff lint fixes, code actions, and formatting |
 | `stylua` | Default Lua formatter |
 | `shfmt` | Formatter for shell buffers |
 | `fish`, including `fish_indent` | Fish linting and formatting |
@@ -80,7 +81,9 @@ These are explicit network and compiler operations. Missing parsers leave native
 
 ## Validation
 
-The default configuration was started with Neovim 0.12.6 against read-only, already installed plugin sources. The verification redirected standard config, data, state, cache, and log paths into ignored `no-sync/`, substituted package installation, and prevented external LSP processes from starting. It exercised actual plugin setup, Lua filetype handling, native LSP configuration and Blink capabilities, and the absence of Lazy management mappings. All Lua modules are checked for syntax.
+The core configuration was started with Neovim 0.12.6 against read-only, already installed plugin sources. The verification redirected standard config, data, state, cache, and log paths into ignored `no-sync/`, substituted package installation, and prevented external LSP processes from starting. It exercised actual plugin setup, Lua filetype handling, native LSP configuration and Blink capabilities, and the absence of Lazy management mappings. All Lua modules are checked for syntax.
+
+Focused Rust/Python checks compare the Rust settings with the original LazyVim module and resolve native ty/Ruff definitions, PATH commands, Conform's Ruff formatters, hover delegation, and Python mappings. These checks substitute Crates and virtual-environment-selector setup; they do not install plugins, launch servers, or run Cargo.
 
 Focused checks also cover containing-workspace boundaries (including `/`), global versus buffer autoformat overrides, per-buffer lint debouncing, folding state when switching between LSP and Tree-sitter buffers in the same window, and the missing-parser guard that prevents Kulala setup from starting a build. Another isolated check resolves 27 optional configuration modules through native server definitions without launching their commands.
 
