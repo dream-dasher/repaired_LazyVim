@@ -33,7 +33,7 @@ Removed automatic Tree-sitter parser installation and update hooks. `:TSInstall`
 
 Blink uses native snippets and Lua fuzzy matching, with prebuilt binary downloads disabled. Removed LazyVim's private native-snippet repair code and cross-provider AI acceptance arbitration. Native snippets handle the supported Neovim syntax directly; snippets that depend on VSCode transforms or repaired repeated defaults may need editing or the documented LuaSnip alternative.
 
-R's default optional module uses the native R language server. R.nvim remains a commented example because its setup can build/install helper components automatically. Rust's optional module disables automatic Cargo checks, build-script evaluation, and procedural macros initially; its header documents how to opt in deliberately. Metals disables automatic build import, and Haskell Tools disables automatic fast-tags generation.
+R's default optional module uses the native R language server. R.nvim remains a commented example because its setup can build/install helper components automatically. Rust is enabled with LazyVim's original automatic Cargo checks, build-script evaluation, and procedural macros; these can run project code and write build output when editing Rust. Metals disables automatic build import, and Haskell Tools disables automatic fast-tags generation.
 
 Kulala is pinned to the verified Lua-based v5.3.4 release. Its setup normally prepares a parser automatically, so this module checks that the parser is already prepared and refuses setup until the documented manual step is complete. This avoids introducing the different backend used by newer releases.
 

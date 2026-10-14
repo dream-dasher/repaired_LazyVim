@@ -25,6 +25,7 @@ Install these yourself; this configuration does not install language servers, fo
 | `rg` | Grep, search and replace, TODO search, and file-finding fallback |
 | `fd` | Recommended file finder; optional features may require it explicitly |
 | `lua-language-server` | Default Lua LSP server |
+| `rustc`, `cargo`, `rust-analyzer` | Enabled Rust support through Rustaceanvim; install rust-analyzer with `rustup component add rust-analyzer` |
 | `stylua` | Default Lua formatter |
 | `shfmt` | Formatter for shell buffers |
 | `fish`, including `fish_indent` | Fish linting and formatting |

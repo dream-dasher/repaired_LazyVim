@@ -5,9 +5,8 @@
 -- LSP definitions / executable details: https://github.com/neovim/nvim-lspconfig/blob/master/doc/configs.txt
 -- Parser installation: https://github.com/nvim-treesitter/nvim-treesitter#installation
 -- Crates: https://github.com/Saecki/crates.nvim ; Rust tools: https://rust-analyzer.github.io/book/installation.html
--- Cargo checks can create target/ output. Automatic cargo checks, build.rs evaluation, and proc-macro execution are disabled here.
--- For trusted projects, enable checkOnSave, cargo.buildScripts.enable, and procMacro.enable directly.
--- Run cargo check/clippy manually until then; the original automatic diagnostics are deliberately dropped.
+-- Retains LazyVim's automatic Cargo checks, build.rs evaluation, and proc-macro execution.
+-- Opening Rust projects can therefore run project code and create target/ output.
 -- Optional tests: enable extras.test.core; add https://github.com/mrcjkb/rustaceanvim
 -- to its vim.pack.add list and require("rustaceanvim.neotest") to its adapters table.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
@@ -23,13 +22,13 @@ vim.g.rustaceanvim = {
       vim.keymap.set("n", "<leader>cR", "<cmd>RustLsp codeAction<cr>", { buffer = buf, desc = "Code Action" })
       vim.keymap.set("n", "<leader>dr", "<cmd>RustLsp debuggables<cr>", { buffer = buf, desc = "Rust Debuggables" })
     end,
-    -- Disable automatic Cargo checks, build scripts, and proc-macro execution.
+    -- Match LazyVim's rust-analyzer diagnostics, build scripts, and procedural macros.
     default_settings = {
       ["rust-analyzer"] = {
-        cargo = { allFeatures = true, loadOutDirsFromCheck = true, buildScripts = { enable = false } }, -- explicitly opt in if your project needs build.rs
-        checkOnSave = false,
+        cargo = { allFeatures = true, loadOutDirsFromCheck = true, buildScripts = { enable = true } },
+        checkOnSave = true,
         diagnostics = { enable = true },
-        procMacro = { enable = false },
+        procMacro = { enable = true },
         files = {
           exclude = { ".direnv", ".git", ".jj", ".github", ".gitlab", "bin", "node_modules", "target", "venv", ".venv" },
           watcher = "client",

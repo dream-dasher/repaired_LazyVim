@@ -1,5 +1,6 @@
 -- Dependencies: Neovim >= 0.12.6; git for native vim.pack plugin installation.
 -- Default external tools: rg, lua-language-server, stylua; fd recommended; shfmt and fish for their filetypes.
+-- Rust: rustc, cargo, and rust-analyzer on PATH; automatic checks/build scripts/proc macros enabled.
 -- Optional: lazygit, gh, a clipboard provider and a Nerd Font.
 -- Manual Tree-sitter builds: curl, tar, a C compiler and tree-sitter CLI >= 0.26.1.
 -- Each module repeats its dependencies; optional modules below are ordinary commented calls.
@@ -405,7 +406,7 @@ require("plugins.ui") -- Bufferline/Lualine/Noice + nui; no external tools.
 -- Dependencies: rustc + cargo; rust-analyzer (rustup component add rust-analyzer); optional codelldb (CodeLLDB release); optional bacon/bacon-ls for alternate diagnostics.
 -- Plugins: mrcjkb/rustaceanvim, Saecki/crates.nvim, plenary.nvim; https://github.com/mrcjkb/rustaceanvim
 -- Parsers (install manually): rust, ron, toml.
--- require("extras.lang.rust")
+require("extras.lang.rust")
 
 -- Dependencies: java (JDK); metals (manually installed launcher, e.g. cs install metals); Scala project build tools as required.
 -- Plugins: scalameta/nvim-metals + plenary.nvim; https://github.com/scalameta/nvim-metals
