@@ -7,6 +7,7 @@
 -- Dropped: framework completion action chaining, automatic brackets, AI/statusline option injection.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load the completion engine and its LSP, path, and buffer sources.
 vim.pack.add({
   "https://github.com/hrsh7th/nvim-cmp",
   "https://github.com/hrsh7th/cmp-nvim-lsp",
@@ -14,10 +15,14 @@ vim.pack.add({
   "https://github.com/hrsh7th/cmp-path",
 })
 local cmp = require("cmp")
+-- Advertise completion capabilities to native LSP clients configured after this module.
 vim.lsp.config("*", { capabilities = require("cmp_nvim_lsp").default_capabilities() })
+-- Give completion ghost text a default highlight that colorschemes may override.
 vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
+-- Configure the menu, native snippet expansion, mappings, and source priority together.
 cmp.setup({
   snippet = {
+    -- Expand the LSP snippet body using Neovim's built-in snippet engine.
     expand = function(args)
       vim.snippet.expand(args.body)
     end,
@@ -30,6 +35,7 @@ cmp.setup({
     ["<C-Space>"] = cmp.mapping.complete(),
     ["<C-e>"] = cmp.mapping.abort(),
     ["<CR>"] = cmp.mapping.confirm({ select = true }),
+    -- Jump to the next snippet field when possible; otherwise delegate to the normal key.
     ["<Tab>"] = cmp.mapping(function(fallback)
       if vim.snippet.active({ direction = 1 }) then
         vim.snippet.jump(1)
@@ -37,6 +43,7 @@ cmp.setup({
         fallback()
       end
     end, { "i", "s" }),
+    -- Jump to the previous snippet field when possible; otherwise delegate to the normal key.
     ["<S-Tab>"] = cmp.mapping(function(fallback)
       if vim.snippet.active({ direction = -1 }) then
         vim.snippet.jump(-1)
@@ -47,6 +54,7 @@ cmp.setup({
   }),
   sources = cmp.config.sources({ { name = "nvim_lsp" }, { name = "path" }, { name = "buffer" } }),
   formatting = {
+    -- Prefix the completion kind with its configured icon and return the modified item.
     format = function(_, item)
       item.kind = (require("config.icons").kinds[item.kind] or "") .. " " .. item.kind
       return item

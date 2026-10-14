@@ -4,9 +4,11 @@
 -- Load after plugins/treesitter.lua. Context is independent of the symbol sidebar/statusline.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Keep up to three enclosing syntax lines visible, using the cursor position as context.
 vim.pack.add({ "https://github.com/nvim-treesitter/nvim-treesitter-context" })
 local context = require("treesitter-context")
 context.setup({ mode = "cursor", max_lines = 3 })
+-- Toggle the context window according to the plugin's current enabled state.
 vim.keymap.set("n", "<leader>ut", function()
   if context.enabled() then
     context.disable()

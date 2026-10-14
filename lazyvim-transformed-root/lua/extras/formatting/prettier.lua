@@ -7,8 +7,10 @@
 -- Config: https://prettier.io/docs/configuration ; https://github.com/stevearc/conform.nvim
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Choose whether Prettier requires a project config before it can format a buffer.
 local conform = require("conform")
 local require_config = false -- Edit directly to require a project Prettier config.
+-- Assign Prettier as the formatter for these supported web/data filetypes.
 for _, ft in ipairs({
   "css",
   "graphql",
@@ -29,7 +31,10 @@ for _, ft in ipairs({
 }) do
   conform.formatters_by_ft[ft] = { "prettier" }
 end
+-- Extend Conform's Prettier definition with an optional per-invocation config check.
 conform.formatters.prettier = {
+  -- Allow formatting immediately unless opt-in is required; then ask the nearest local binary
+  -- (or PATH fallback) for this file's config and require a successful, nonempty response.
   condition = function(_, ctx)
     if not require_config then
       return true

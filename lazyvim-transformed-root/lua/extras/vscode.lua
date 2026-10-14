@@ -9,9 +9,11 @@
 -- If used after core keymaps instead, move this call last so VS Code's actions replace terminal mappings.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Leave terminal Neovim unchanged; the vscode Lua bridge exists only inside the extension.
 if not vim.g.vscode then
   return
 end
+-- Route file search, workspace search, and symbol selection through VS Code's UI.
 local vscode = require("vscode")
 local map = vim.keymap.set
 map("n", "<leader><space>", function()
@@ -23,11 +25,13 @@ end, { desc = "Find in files" })
 map("n", "<leader>ss", function()
   vscode.call("workbench.action.gotoSymbol")
 end, { desc = "Symbols" })
+-- Use VS Code's terminal panel for the shared terminal keys.
 for _, key in ipairs({ "<leader>ft", "<leader>fT", "<C-/>" }) do
   map("n", key, function()
     vscode.call("workbench.action.terminal.toggleTerminal")
   end, { desc = "Toggle VS Code terminal" })
 end
+-- Navigate VS Code editors instead of Neovim's terminal buffer list.
 map("n", "<S-h>", function()
   vscode.call("workbench.action.previousEditor")
 end, { desc = "Previous editor" })

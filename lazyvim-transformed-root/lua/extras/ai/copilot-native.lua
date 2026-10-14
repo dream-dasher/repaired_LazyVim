@@ -7,17 +7,22 @@
 -- Uses Alt-l accept; to use Tab directly edit plugins/blink.lua keymap with function() return vim.lsp.inline_completion.get() end before fallback.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Make the native Copilot server definition available.
 vim.pack.add({ "https://github.com/neovim/nvim-lspconfig" })
+-- Stop if the separately installed server is missing; no installer runs here.
 if vim.fn.executable("copilot-language-server") == 0 then
   vim.notify("Install copilot-language-server on PATH before enabling native Copilot.", vim.log.levels.WARN)
   return
 end
+-- Start the Copilot LSP when applicable and enable Neovim's inline completion UI.
 vim.lsp.config("copilot", { cmd = { "copilot-language-server", "--stdio" } })
 vim.lsp.enable("copilot")
 vim.lsp.inline_completion.enable()
+-- Consume Alt-l when an inline suggestion is accepted; otherwise return the original key.
 vim.keymap.set("i", "<M-l>", function()
   return vim.lsp.inline_completion.get() and "" or "<M-l>"
 end, { expr = true, desc = "Accept inline suggestion" })
+-- Cycle forward and backward through the available inline suggestions.
 vim.keymap.set({ "i", "n" }, "<M-]>", function()
   vim.lsp.inline_completion.select({ count = 1 })
 end, { desc = "Next inline suggestion" })

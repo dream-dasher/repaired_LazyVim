@@ -7,9 +7,11 @@
 -- Optional Edgy: directly add {title='Aerial',ft='aerial',pinned=true,open='AerialOpen'} to extras/ui/edgy.lua right.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load the symbol sidebar and adapt the shared icons without changing the original icon table.
 vim.pack.add({ "https://github.com/stevearc/aerial.nvim" })
 local icons = vim.deepcopy(require("config.icons").kinds)
 icons.lua = { Package = icons.Control }
+-- Show all symbol kinds with guides, using the first available backend in this order.
 require("aerial").setup({
   attach_mode = "global",
   backends = { "lsp", "treesitter", "markdown", "man" },
@@ -22,6 +24,7 @@ require("aerial").setup({
   },
   guides = { mid_item = "├╴", last_item = "└╴", nested_top = "│ ", whitespace = "  " },
 })
+-- Toggle the symbol sidebar on the shared symbol-navigation key.
 vim.keymap.set("n", "<leader>cs", "<cmd>AerialToggle<cr>", { desc = "Symbols (Aerial)" })
 -- If enabling Telescope, place its require before this module then uncomment:
 -- require("telescope").load_extension("aerial")

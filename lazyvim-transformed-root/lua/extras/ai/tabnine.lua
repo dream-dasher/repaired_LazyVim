@@ -8,8 +8,10 @@
 -- Dropped: automatic lualine source injection and percentage-menu wrapper.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Register the cmp compatibility layer before loading the Tabnine source.
 vim.pack.add({ { src = "https://github.com/saghen/blink.compat", version = vim.version.range("2.x") } })
 require("blink.compat").setup({})
+-- Limit Tabnine context/results; the binary and completion-provider wiring remain manual.
 vim.pack.add({ "https://github.com/tzachar/cmp-tabnine" })
 require("cmp_tabnine.config"):setup({ max_lines = 1000, max_num_results = 3, sort = true })
 -- Direct edit in plugins/blink.lua:

@@ -8,6 +8,7 @@
 -- Dropped: session ExitPre buftype mutation and automatic Git-extra import; enable extras.lang.git separately if wanted.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load the GitHub buffer workflow and configure Snacks selection plus squash-merge defaults.
 vim.pack.add({ "https://github.com/nvim-lua/plenary.nvim", "https://github.com/pwntester/octo.nvim" })
 require("octo").setup({
   enable_builtin = true,
@@ -15,7 +16,9 @@ require("octo").setup({
   default_merge_method = "squash",
   picker = "snacks",
 })
+-- Parse Octo text as Markdown when its parser is available.
 vim.treesitter.language.register("markdown", "octo")
+-- Provide issue, pull-request, repository, and global GitHub search commands.
 for key, command in pairs({
   gi = "Octo issue list",
   gI = "Octo issue search",
@@ -26,6 +29,7 @@ for key, command in pairs({
 }) do
   vim.keymap.set("n", "<leader>" .. key, "<cmd>" .. command .. "<cr>", { desc = command })
 end
+-- In Octo buffers, start user/issue omnifunc completion immediately after typing @ or #.
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "octo",
   callback = function(event)

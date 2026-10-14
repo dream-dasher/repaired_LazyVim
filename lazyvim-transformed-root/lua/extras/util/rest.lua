@@ -12,8 +12,10 @@
 -- No compiler or parser-install command is invoked from this module.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Recognize .http buffers and load the reviewed Lua-based Kulala release.
 vim.filetype.add({ extension = { http = "http" } })
 vim.pack.add({ { src = "https://github.com/dont-be-evil-company/kulala.nvim", version = "v5.3.4" } })
+-- Stop before Kulala setup if the existing parser cannot be loaded, preventing automatic compilation.
 local parser_ok, parser_loaded = pcall(vim.treesitter.language.add, "kulala_http")
 if not parser_ok or not parser_loaded then
   vim.notify(
@@ -31,10 +33,12 @@ if ok and old_ts.get_parser_install_dir then
     directories[#directories + 1] = dir
   end
 end
+-- Compare Kulala's bundled parser version with the previously recorded installation version.
 local fs = require("kulala.utils.fs")
 local metadata = fs.read_json(fs.get_plugin_path({ "..", "tree-sitter" }) .. "/tree-sitter.json")
 local expected = metadata and metadata.metadata and metadata.metadata.version
 local recorded = require("kulala.db").settings.parser_ver
+-- Stop if an installed parser would trigger upstream's version-based rebuild on setup.
 for _, directory in ipairs(directories) do
   for _, extension in ipairs({ "so", "dylib", "dll" }) do
     if vim.uv.fs_stat(directory .. "/kulala_http." .. extension) and recorded ~= expected then
@@ -46,6 +50,7 @@ for _, directory in ipairs(directories) do
     end
   end
 end
+-- Initialize only after the parser preflight, then expose scratchpad and replay actions.
 local kulala = require("kulala")
 kulala.setup({})
 vim.keymap.set("n", "<leader>Rb", function()
@@ -54,6 +59,7 @@ end, { desc = "HTTP scratchpad" })
 vim.keymap.set("n", "<leader>Rr", function()
   kulala.replay()
 end, { desc = "Replay HTTP request" })
+-- Add request/environment/navigation actions only to HTTP buffers when their filetype is assigned.
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "http",
   callback = function(event)

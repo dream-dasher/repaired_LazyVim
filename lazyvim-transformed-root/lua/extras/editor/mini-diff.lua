@@ -6,12 +6,15 @@
 -- Lualine source example: local s=vim.b.minidiff_summary; return s and {added=s.add,modified=s.change,removed=s.delete}.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Show Git changes as gutter signs using mini.diff's default source.
 vim.pack.add({ "https://github.com/nvim-mini/mini.diff" })
 local diff = require("mini.diff")
 diff.setup({ view = { style = "sign", signs = { add = "▎", change = "▎", delete = "" } } })
+-- Toggle the expanded diff overlay for the current buffer (buffer 0).
 vim.keymap.set("n", "<leader>go", function()
   diff.toggle_overlay(0)
 end, { desc = "Toggle diff overlay" })
+-- Flip the shared disable flag and immediately apply that state to the current buffer.
 vim.keymap.set("n", "<leader>uG", function()
   vim.g.minidiff_disable = not vim.g.minidiff_disable
   if vim.g.minidiff_disable then

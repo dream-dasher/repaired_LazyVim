@@ -7,6 +7,7 @@
 -- Optional DAP: enable extras.dap.core first for <leader>td. No adapter registry or runtime setup merging.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load test orchestration and its Lua dependencies; adapters must be added explicitly.
 vim.pack.add({
   "https://github.com/nvim-neotest/nvim-nio",
   "https://github.com/nvim-lua/plenary.nvim",
@@ -15,6 +16,7 @@ vim.pack.add({
   -- "https://github.com/nvim-neotest/neotest-python",
 })
 local neotest = require("neotest")
+-- Configure test status/output and keep the adapter list editable in this file.
 neotest.setup({
   adapters = {
     -- require("neotest-python")({ python = "python3" }),
@@ -22,11 +24,13 @@ neotest.setup({
   status = { virtual_text = true },
   output = { open_on_run = true },
   quickfix = {
+    -- Show test quickfix results through Trouble without taking focus from the current window.
     open = function()
       require("trouble").open({ mode = "quickfix", focus = false })
     end,
   },
 })
+-- Keep test diagnostic messages on one line in Neotest's namespace, preserving other diagnostics.
 vim.diagnostic.config({
   virtual_text = {
     format = function(diagnostic)
@@ -34,6 +38,7 @@ vim.diagnostic.config({
     end,
   },
 }, vim.api.nvim_create_namespace("neotest"))
+-- Run/attach to file, project, nearest, or previous tests only when a test key is invoked.
 local map = vim.keymap.set
 map("n", "<leader>ta", function()
   neotest.run.attach()
@@ -50,6 +55,7 @@ end, { desc = "Test nearest" })
 map("n", "<leader>tl", function()
   neotest.run.run_last()
 end, { desc = "Test last" })
+-- Inspect test summaries/output, stop runs, or toggle watching for the current file.
 map("n", "<leader>ts", function()
   neotest.summary.toggle()
 end, { desc = "Test summary" })
@@ -65,6 +71,7 @@ end, { desc = "Stop test" })
 map("n", "<leader>tw", function()
   neotest.watch.toggle(vim.fn.expand("%"))
 end, { desc = "Watch test file" })
+-- Run the nearest test through its adapter's DAP strategy instead of the normal runner.
 map("n", "<leader>td", function()
   neotest.run.run({ strategy = "dap" })
 end, { desc = "Debug nearest test" })

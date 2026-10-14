@@ -6,6 +6,7 @@
 -- GitUI's actions can modify the repository; this module only opens it on explicit invocation.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Launch GitUI in a Snacks terminal at project root or the current working directory.
 vim.keymap.set("n", "<leader>gg", function()
   Snacks.terminal({ "gitui" }, { cwd = require("util.root").get() })
 end, { desc = "GitUI (root)" })

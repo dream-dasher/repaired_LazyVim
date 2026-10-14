@@ -6,8 +6,10 @@
 -- To make it your sole formatter, directly replace util.format's formatting call with vim.lsp.buf.format and filter client.name=='null-ls'.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load the executable-to-LSP bridge and its Lua dependency.
 vim.pack.add({ "https://github.com/nvim-lua/plenary.nvim", "https://github.com/nvimtools/none-ls.nvim" })
 local nls = require("null-ls")
+-- Find a project root from these markers and expose only the explicitly listed tools.
 nls.setup({
   root_dir = require("null-ls.utils").root_pattern(".null-ls-root", ".neoconf.json", "Makefile", ".git"),
   sources = {
@@ -17,6 +19,7 @@ nls.setup({
     nls.builtins.formatting.shfmt,
   },
 })
+-- Format synchronously through null-ls only; exclude all other attached LSP clients.
 vim.keymap.set({ "n", "x" }, "<leader>cN", function()
   vim.lsp.buf.format({
     async = false,

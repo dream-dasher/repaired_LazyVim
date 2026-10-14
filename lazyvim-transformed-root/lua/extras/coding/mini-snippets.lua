@@ -7,10 +7,12 @@
 -- To keep standalone snippets out of the completion menu, remove 'snippets' from Blink sources.default.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Make the snippet engine and language-specific snippet collection available.
 vim.pack.add({
   "https://github.com/nvim-mini/mini.snippets",
   "https://github.com/rafamadriz/friendly-snippets",
 })
+-- Load snippets for the active language using the engine's standard expansion/navigation keys.
 local snippets = require("mini.snippets")
 snippets.setup({
   snippets = { snippets.gen_loader.from_lang() },

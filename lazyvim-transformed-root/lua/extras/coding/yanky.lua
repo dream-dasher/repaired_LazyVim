@@ -5,15 +5,18 @@
 -- Conflicts: replaces p/P/gp/gP and several bracket mappings. Edit those keys directly if needed.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load yank history with its Lua dependency.
 vim.pack.add({
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/gbprod/yanky.nvim",
 })
+-- Persist history in ShaDa; avoid syncing the remote editor's ring with the system clipboard.
 require("yanky").setup({
   highlight = { timer = 150 },
   ring = { storage = "shada" },
   system_clipboard = { sync_with_ring = not vim.env.SSH_CONNECTION },
 })
+-- Route yank/put operations through the history ring and add history cycling/picking.
 local map = vim.keymap.set
 map({ "n", "x" }, "y", "<Plug>(YankyYank)", { desc = "Yank text" })
 map({ "n", "x" }, "p", "<Plug>(YankyPutAfter)", { desc = "Put after" })
@@ -25,6 +28,7 @@ map("n", "]y", "<Plug>(YankyCycleBackward)", { desc = "Cycle backward through ya
 map({ "n", "x" }, "<leader>p", function()
   Snacks.picker.yanky()
 end, { desc = "Yank history" })
+-- Provide linewise, shifted, and reindented variants of putting text.
 for key, plug in pairs({
   ["]p"] = "YankyPutIndentAfterLinewise",
   ["[p"] = "YankyPutIndentBeforeLinewise",

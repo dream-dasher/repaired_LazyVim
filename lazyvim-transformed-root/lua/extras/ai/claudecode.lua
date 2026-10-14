@@ -6,8 +6,10 @@
 -- Plugin buffers/diff operations are user invoked; this config never installs or starts authentication.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load the Claude Code bridge; the CLI and authentication are managed separately.
 vim.pack.add({ "https://github.com/coder/claudecode.nvim" })
 require("claudecode").setup({})
+-- Map session control, file context, selection sending, and diff decisions.
 local map = vim.keymap.set
 for key, command in pairs({
   ac = "ClaudeCode",
@@ -21,6 +23,7 @@ for key, command in pairs({
   map("n", "<leader>" .. key, "<cmd>" .. command .. "<cr>", { desc = command })
 end
 map("x", "<leader>as", "<cmd>ClaudeCodeSend<cr>", { desc = "Send selection to Claude" })
+-- In supported file-tree buffers, make the send key add the selected file as context.
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "NvimTree", "neo-tree", "oil" },
   callback = function(event)

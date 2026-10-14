@@ -5,13 +5,16 @@
 -- Conflicts: both own commentstring behavior; choose one contextual-comment plugin.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load comment operators and the Tree-sitter-aware commentstring resolver.
 vim.pack.add({
   "https://github.com/nvim-mini/mini.comment",
   "https://github.com/JoosepAlviste/nvim-ts-context-commentstring",
 })
+-- Resolve comment syntax on demand instead of installing a separate commentstring autocmd.
 require("ts_context_commentstring").setup({ enable_autocmd = false })
 require("mini.comment").setup({
   options = {
+    -- Prefer syntax for the embedded language, falling back to the buffer commentstring.
     custom_commentstring = function()
       return require("ts_context_commentstring.internal").calculate_commentstring() or vim.bo.commentstring
     end,
