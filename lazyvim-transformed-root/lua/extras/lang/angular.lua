@@ -8,8 +8,11 @@
 -- Server definition: https://github.com/neovim/nvim-lspconfig/blob/master/lsp/angularls.lua
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Extend vtsls initialization so TypeScript understands Angular projects.
+-- Preserve the previous callback, allowing other framework extras to coexist.
 local previous_before_init = vim.lsp.config.vtsls.before_init
 vim.lsp.config("vtsls", {
+  -- Add the Angular tsserver plugin before each client initializes.
   before_init = function(params, config)
     if previous_before_init then
       previous_before_init(params, config)
@@ -17,6 +20,7 @@ vim.lsp.config("vtsls", {
     -- Edit this location for global/custom npm layouts; default is project-local.
     local location = vim.env.NVIM_ANGULAR_TS_PLUGIN
       or vim.fs.joinpath(config.root_dir or vim.fn.getcwd(), "node_modules", "@angular/language-server")
+    -- Append to the shared plugin list rather than replace earlier integrations.
     local settings = config.settings.vtsls
     settings.tsserver = settings.tsserver or {}
     settings.tsserver.globalPlugins = settings.tsserver.globalPlugins or {}
@@ -27,12 +31,16 @@ vim.lsp.config("vtsls", {
     })
   end,
 })
+-- Run Angular-specific template analysis alongside vtsls.
 vim.lsp.config("angularls", {
+  -- Let the TypeScript client own rename requests instead of offering both.
   on_attach = function(client)
     client.server_capabilities.renameProvider = false
   end,
 })
 vim.lsp.enable("angularls")
+-- On opening or creating Angular template files, try the Angular parser.
+-- A missing parser is tolerated, leaving other highlighting available.
 vim.api.nvim_create_autocmd({ "BufReadPost", "BufNewFile" }, {
   group = vim.api.nvim_create_augroup("AngularParser", { clear = true }),
   pattern = { "*.component.html", "*.container.html" },

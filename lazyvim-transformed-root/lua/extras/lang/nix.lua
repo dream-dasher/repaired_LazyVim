@@ -6,11 +6,14 @@
 -- Tools: https://github.com/oxalica/nil ; https://github.com/nerdypepper/statix
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Enable nil for Nix language navigation, completion, and diagnostics.
 vim.lsp.config("nil_ls", {})
 vim.lsp.enable({ "nil_ls" })
 
+-- Use nixfmt through the existing formatting hooks.
 local conform = require("conform")
 conform.formatters_by_ft["nix"] = { "nixfmt" }
 
+-- Add Statix diagnostics through the core lint events.
 local lint = require("lint")
 lint.linters_by_ft["nix"] = { "statix" }

@@ -12,10 +12,12 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Pair Pyright navigation/type analysis with Ruff lint fixes and code actions.
 vim.lsp.config("pyright", {})
 vim.lsp.config("ruff", {
   cmd_env = { RUFF_TRACE = "messages" },
   init_options = { settings = { logLevel = "error" } },
+  -- Let Pyright answer hover requests to avoid competing Ruff responses.
   on_attach = function(client)
     client.server_capabilities.hoverProvider = false
   end,
@@ -23,13 +25,16 @@ vim.lsp.config("ruff", {
 vim.lsp.enable({ "pyright", "ruff" })
 -- Alternative: replace pyright with basedpyright (pip basedpyright; basedpyright-langserver).
 -- Use either pyright or basedpyright; use the native Ruff server rather than deprecated ruff-lsp.
+-- Load virtual-environment selection with activation notifications enabled.
 vim.pack.add({ { src = "https://github.com/linux-cultist/venv-selector.nvim" } })
 require("venv-selector").setup({ options = {
   notify_user_on_venv_activation = true,
   override_notify = false,
 } })
+-- Apply Ruff fixes before Ruff formatting through Conform.
 require("conform").formatters_by_ft.python = { "ruff_fix", "ruff_format" }
 local group = vim.api.nvim_create_augroup("PythonMappings", { clear = true })
+-- Add virtual-environment selection only to buffers detected as Python.
 vim.api.nvim_create_autocmd("FileType", {
   group = group,
   pattern = "python",
@@ -37,9 +42,11 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set("n", "<leader>cv", "<cmd>VenvSelect<cr>", { buffer = event.buf, desc = "Select VirtualEnv" })
   end,
 })
+-- Add debugpy integration only when the optional DAP module is available.
 if pcall(require, "dap") then
   vim.pack.add({ { src = "https://github.com/mfussenegger/nvim-dap-python" } })
   require("dap-python").setup("debugpy-adapter")
+  -- On Python filetype detection, add mappings to debug a test method or class.
   vim.api.nvim_create_autocmd("FileType", {
     group = group,
     pattern = "python",

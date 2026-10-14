@@ -10,7 +10,9 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Configure the native R server without enabling the optional REPL plugin.
 vim.lsp.config("r_language_server", {
+  -- Use the nearest package/repository root, falling back to the file directory.
   root_dir = function(buf, on_dir)
     on_dir(
       vim.fs.root(buf, { "DESCRIPTION", "NAMESPACE", ".Rbuildignore", ".git" })

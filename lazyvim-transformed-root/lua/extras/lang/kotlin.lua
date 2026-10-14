@@ -8,10 +8,13 @@
 -- Build the project explicitly before launch; this module does not run Gradle.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Enable Kotlin language support using the installed server definition.
 vim.lsp.config("kotlin_language_server", {})
 vim.lsp.enable("kotlin_language_server")
+-- Use ktlint for both formatting and the core lint events.
 require("conform").formatters_by_ft.kotlin = { "ktlint" }
 require("lint").linters_by_ft.kotlin = { "ktlint" }
+-- Configure launch and remote-attach options only when DAP is available.
 local ok, dap = pcall(require, "dap")
 if ok then
   dap.adapters.kotlin =
@@ -22,6 +25,7 @@ if ok then
       request = "launch",
       name = "This file",
       projectRoot = "${workspaceFolder}",
+      -- Infer the JVM file class from a conventional source path; otherwise ask.
       mainClass = function()
         local file = vim.api.nvim_buf_get_name(0)
         local relative = file:match("/src/main/kotlin/(.+)%.kt$")

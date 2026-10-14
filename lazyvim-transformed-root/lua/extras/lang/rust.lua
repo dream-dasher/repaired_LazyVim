@@ -13,14 +13,17 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Configure rust-analyzer and debugger options before the plugin scripts load.
 vim.g.rustaceanvim = {
   server = {
     cmd = { "rust-analyzer" },
     capabilities = require("blink.cmp").get_lsp_capabilities(),
+    -- Add Rust-specific code-action and debuggable-target mappings on attachment.
     on_attach = function(_, buf)
       vim.keymap.set("n", "<leader>cR", "<cmd>RustLsp codeAction<cr>", { buffer = buf, desc = "Code Action" })
       vim.keymap.set("n", "<leader>dr", "<cmd>RustLsp debuggables<cr>", { buffer = buf, desc = "Rust Debuggables" })
     end,
+    -- Disable automatic Cargo checks, build scripts, and proc-macro execution.
     default_settings = {
       ["rust-analyzer"] = {
         cargo = { allFeatures = true, loadOutDirsFromCheck = true, buildScripts = { enable = false } }, -- explicitly opt in if your project needs build.rs
@@ -34,6 +37,7 @@ vim.g.rustaceanvim = {
       },
     },
   },
+  -- Describe the manually installed CodeLLDB adapter used for Rust debugging.
   dap = {
     adapter = {
       type = "server",
@@ -43,11 +47,13 @@ vim.g.rustaceanvim = {
     },
   },
 }
+-- Load the Rust LSP owner and Cargo dependency tooling with its Lua dependency.
 vim.pack.add({
   { src = "https://github.com/mrcjkb/rustaceanvim" },
   { src = "https://github.com/Saecki/crates.nvim" },
   { src = "https://github.com/nvim-lua/plenary.nvim" },
 })
+-- Enable Cargo.toml dependency completion, hover, and code actions.
 require("crates").setup({
   completion = { crates = { enabled = true } },
   lsp = { enabled = true, actions = true, completion = true, hover = true },

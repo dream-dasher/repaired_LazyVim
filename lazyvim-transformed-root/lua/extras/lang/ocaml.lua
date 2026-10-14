@@ -7,6 +7,7 @@
 -- Native root_markers uses filenames; the previous wildcard root matching is simplified to project markers.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Cover OCaml-related filetypes and identify projects by Dune/package markers.
 vim.lsp.config("ocamllsp", {
   filetypes = { "ocaml", "ocaml.menhir", "ocaml.interface", "ocaml.ocamllex", "reason", "dune" },
   root_markers = { "dune-project", "dune-workspace", "esy.json", "package.json", ".git" },

@@ -12,8 +12,10 @@
 -- One ordinary require chooses the default. Edit this line to use the tsc module instead.
 require("extras.lang.typescript.vtsls")
 -- require("extras.lang.typescript.tsc") -- mutually exclusive with vtsls above
+-- Configure JavaScript/TypeScript debugging only if DAP is already available.
 local ok, dap = pcall(require, "dap")
 if ok then
+  -- Launch the shared js-debug server for Node, Chrome, and Edge sessions.
   for _, kind in ipairs({ "node", "chrome", "msedge" }) do
     local pwa = "pwa-" .. kind
     dap.adapters[pwa] = {
@@ -22,16 +24,20 @@ if ok then
       port = "${port}",
       executable = { command = "js-debug-adapter", args = { "${port}" } },
     }
+    -- Translate familiar launch.json adapter names to js-debug's pwa names.
     dap.adapters[kind] = function(callback, config)
       config.type = pwa
       callback(dap.adapters[pwa])
     end
   end
+  -- Associate VS Code Node configurations with the JavaScript/TypeScript filetypes.
   local filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" }
   local vscode = require("dap.ext.vscode")
   vscode.type_to_filetypes.node = filetypes
   vscode.type_to_filetypes["pwa-node"] = filetypes
+  -- Offer current-file launch and process attachment for each supported filetype.
   for _, ft in ipairs(filetypes) do
+    -- TypeScript needs tsx or ts-node; JavaScript uses the adapter's default runtime.
     local runtime = ft:find("typescript") and (vim.fn.executable("tsx") == 1 and "tsx" or "ts-node") or nil
     dap.configurations[ft] = {
       {

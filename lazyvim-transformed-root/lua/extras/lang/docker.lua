@@ -6,9 +6,11 @@
 -- Lint tool: https://github.com/hadolint/hadolint ; Docker daemon is not needed for LSP/lint.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Enable separate language servers for Dockerfiles and Compose files.
 vim.lsp.config("dockerls", {})
 vim.lsp.config("docker_compose_language_service", {})
 vim.lsp.enable({ "dockerls", "docker_compose_language_service" })
 
+-- Add Hadolint checks to Dockerfile buffers through the core lint hooks.
 local lint = require("lint")
 lint.linters_by_ft["dockerfile"] = { "hadolint" }

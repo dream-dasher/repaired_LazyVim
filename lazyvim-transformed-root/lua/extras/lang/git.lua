@@ -13,6 +13,7 @@
 vim.pack.add({
   { src = "https://github.com/petertriho/cmp-git" },
 })
+-- Register Git completion and attach it specifically to commit-message buffers.
 local blink = require("blink.cmp")
 blink.add_source_provider("git", { name = "git", module = "cmp_git.blink" })
 blink.add_filetype_source("gitcommit", "git")

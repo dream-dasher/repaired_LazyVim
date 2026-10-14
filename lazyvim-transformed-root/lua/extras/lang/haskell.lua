@@ -21,6 +21,8 @@ vim.g.haskell_tools = {
 }
 vim.pack.add({ { src = "https://github.com/mrcjkb/haskell-tools.nvim", version = vim.version.range("^10") } })
 -- Single owner: haskell-tools attaches HLS. Do not also vim.lsp.enable("hls").
+-- On Haskell filetype detection, add buffer-local evaluation, Hoogle, and REPL
+-- mappings; the buffer REPL passes the current file rather than the package root.
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("HaskellMappings", { clear = true }),
   pattern = { "haskell", "lhaskell" },
@@ -34,6 +36,7 @@ vim.api.nvim_create_autocmd("FileType", {
     end, { buffer = event.buf, desc = "REPL (Buffer)" })
   end,
 })
+-- Format Haskell/Cabal with their CLI tools and lint Haskell through hlint.
 local conform = require("conform")
 conform.formatters_by_ft.haskell = { "fourmolu" }
 conform.formatters_by_ft.cabal = { "cabal_fmt" }

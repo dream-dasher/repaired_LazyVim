@@ -9,11 +9,14 @@
 -- and adapters require("neotest-pest") and require("neotest-phpunit")({ root_ignore_files = { "tests/Pest.php" } }).
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Use Phpactor as the primary PHP server.
 vim.lsp.config("phpactor", {})
 vim.lsp.enable("phpactor")
 -- Alternative: replace both phpactor lines with intelephense (npm intelephense; needs node).
+-- Format with PHP CS Fixer and lint with PHP_CodeSniffer via the core hooks.
 require("conform").formatters_by_ft.php = { "php_cs_fixer" }
 require("lint").linters_by_ft.php = { "phpcs" }
+-- Register the PHP debug adapter only if the optional DAP module is loaded.
 local ok, dap = pcall(require, "dap")
 if ok then
   dap.adapters.php = { type = "executable", command = "php-debug-adapter", args = {} }

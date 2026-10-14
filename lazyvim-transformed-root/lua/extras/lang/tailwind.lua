@@ -6,9 +6,11 @@
 -- Add any additional filetypes directly to the filetypes list above.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Retain the server's supported filetypes but keep it out of plain Markdown.
 local filetypes = vim.tbl_filter(function(ft)
   return ft ~= "markdown"
 end, vim.lsp.config.tailwindcss.filetypes or {})
+-- Treat Elixir template variants as HTML when extracting Tailwind class names.
 vim.lsp.config("tailwindcss", {
   filetypes = filetypes,
   settings = {

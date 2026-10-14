@@ -7,7 +7,9 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Load the bundled schema catalog used by JSON validation and completion.
 vim.pack.add({ { src = "https://github.com/b0o/SchemaStore.nvim" } })
+-- Give jsonls known schemas and enable its formatting and validation support.
 vim.lsp.config("jsonls", {
   settings = {
     json = {

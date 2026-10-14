@@ -9,7 +9,9 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Load the extension that supplies source/header switching and AST tools.
 vim.pack.add({ { src = "https://github.com/p00f/clangd_extensions.nvim" } })
+-- Choose icons for syntax-tree roles and node kinds shown by AST views.
 require("clangd_extensions").setup({
   ast = {
     role_icons = {
@@ -31,6 +33,7 @@ require("clangd_extensions").setup({
     },
   },
 })
+-- Configure indexing, clang-tidy diagnostics, completion, and project markers.
 vim.lsp.config("clangd", {
   cmd = {
     "clangd",
@@ -53,8 +56,10 @@ vim.lsp.config("clangd", {
     "build.ninja",
     ".git",
   },
+  -- Use UTF-16 positions consistently with clangd completion and edits.
   capabilities = { offsetEncoding = { "utf-16" } },
   init_options = { usePlaceholders = true, completeUnimported = true, clangdFileStatus = true },
+  -- Add source/header switching only to buffers attached to clangd.
   on_attach = function(_, buf)
     vim.keymap.set(
       "n",
@@ -65,11 +70,13 @@ vim.lsp.config("clangd", {
   end,
 })
 vim.lsp.enable("clangd")
+-- Use clang-format for C-family buffers, independently of LSP formatting.
 local conform = require("conform")
 for _, ft in ipairs({ "c", "cpp", "objc", "objcpp", "cuda" }) do
   conform.formatters_by_ft[ft] = { "clang_format" }
 end
 
+-- Configure CodeLLDB only when the optional DAP module is available.
 local ok, dap = pcall(require, "dap")
 if ok then
   dap.adapters.codelldb = {
@@ -78,12 +85,14 @@ if ok then
     port = "${port}",
     executable = { command = "codelldb", args = { "--port", "${port}" } },
   }
+  -- Offer either launching a chosen executable or attaching to a process.
   for _, ft in ipairs({ "c", "cpp" }) do
     dap.configurations[ft] = {
       {
         type = "codelldb",
         request = "launch",
         name = "Launch file",
+        -- Ask for the compiled executable when the launch configuration runs.
         program = function()
           return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
         end,

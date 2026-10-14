@@ -18,11 +18,13 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Configure gopls analyses, completion, inlay hints, and available code lenses.
 vim.lsp.config("gopls", {
   init_options = { semanticTokens = true },
   settings = {
     gopls = {
       gofumpt = true,
+      -- Expose project actions for explicit invocation; some perform builds or edits.
       codelenses = {
         gc_details = false,
         generate = true,
@@ -33,6 +35,7 @@ vim.lsp.config("gopls", {
         upgrade_dependency = true,
         vendor = true,
       },
+      -- Show inferred types and parameter/field names beside source code.
       hints = {
         assignVariableTypes = true,
         compositeLiteralFields = true,
@@ -42,6 +45,7 @@ vim.lsp.config("gopls", {
         parameterNames = true,
         rangeVariableTypes = true,
       },
+      -- Enable extra static checks and completion while excluding tool directories.
       analyses = { nilness = true, unusedparams = true, unusedwrite = true, useany = true },
       usePlaceholders = true,
       completeUnimported = true,
@@ -51,8 +55,11 @@ vim.lsp.config("gopls", {
   },
 })
 vim.lsp.enable("gopls")
+-- Organize imports first, then apply gofumpt formatting through Conform.
 require("conform").formatters_by_ft.go = { "goimports", "gofumpt" }
+-- Run golangci-lint through the existing core lint events.
 require("lint").linters_by_ft.go = { "golangcilint" }
+-- Add Delve integration only when the optional DAP configuration is loaded.
 if pcall(require, "dap") then
   vim.pack.add({ { src = "https://github.com/leoluz/nvim-dap-go" } })
   require("dap-go").setup({})
