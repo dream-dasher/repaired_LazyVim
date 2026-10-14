@@ -12,21 +12,26 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Load the Snacks bundle before setup and before any mappings can call its components.
 vim.pack.add({ { src = "https://github.com/folke/snacks.nvim" } })
 local snacks = require("snacks")
 local root = require("util.root")
 
+--- Build a terminal mapping that moves to the neighboring window in the given direction.
+--- Floating terminals receive the original Ctrl key; normal terminal windows schedule a move.
 local function term_nav(direction)
   return function(terminal)
     if terminal:is_floating() then
       return "<C-" .. direction .. ">"
     end
+    -- Leave the expression-mapping callback before changing the active window.
     vim.schedule(function()
       vim.cmd.wincmd(direction)
     end)
   end
 end
 
+-- Enable the chosen UI components in one place; setup registers the gutter after Snacks loads.
 snacks.setup({
   bigfile = { enabled = true },
   quickfile = { enabled = true },
@@ -39,6 +44,7 @@ snacks.setup({
   image = { enabled = false },
   statuscolumn = { enabled = true },
   explorer = { enabled = true },
+  -- Use the same directional window keys in normal terminal windows as in editing windows.
   terminal = {
     win = {
       keys = {
@@ -51,6 +57,7 @@ snacks.setup({
       },
     },
   },
+  -- Extend picker keys with root/cwd switching, Trouble export and Flash selection.
   picker = {
     enabled = true,
     win = {
@@ -64,15 +71,18 @@ snacks.setup({
       },
     },
     actions = {
+      -- Toggle between the source buffer's project root and Neovim's current directory, then search again.
       toggle_cwd = function(picker)
         local project = root.get(picker.input.filter.current_buf)
         local cwd = vim.fs.normalize(vim.fn.getcwd())
         picker:set_cwd(picker:cwd() == project and cwd or project)
         picker:find()
       end,
+      -- Hand picker results to Trouble's Snacks integration.
       trouble_open = function(...)
         return require("trouble.sources.snacks").actions.trouble_open.action(...)
       end,
+      -- Label picker rows with Flash and move the selection to the chosen row.
       flash = function(picker)
         require("flash").jump({
           pattern = "^",
@@ -80,11 +90,13 @@ snacks.setup({
           search = {
             mode = "search",
             exclude = {
+              -- Restrict jump targets to the picker list rather than its input or preview.
               function(win)
                 return vim.bo[vim.api.nvim_win_get_buf(win)].filetype ~= "snacks_picker_list"
               end,
             },
           },
+          -- Convert the matched list row to a picker item and select it.
           action = function(match)
             picker.list:_move(picker.list:row2idx(match.pos[1]), true, true)
           end,
@@ -92,6 +104,7 @@ snacks.setup({
       end,
     },
   },
+  -- Offer explicit file/search/project/session actions on the startup screen.
   dashboard = {
     enabled = true,
     preset = {
@@ -154,6 +167,7 @@ snacks.setup({
   },
 })
 
+-- Common entry points for buffers, project searches, command history and notifications.
 local map = vim.keymap.set
 map("n", "<leader>,", function()
   snacks.picker.buffers()
@@ -173,6 +187,7 @@ end, { desc = "Notification History" })
 map("n", "<leader>un", function()
   snacks.notifier.hide()
 end, { desc = "Dismiss Notifications" })
+-- File and buffer pickers include project-root, cwd, config-directory and recent-file choices.
 map("n", "<leader>fb", function()
   snacks.picker.buffers()
 end, { desc = "Buffers" })
@@ -200,6 +215,7 @@ end, { desc = "Recent (cwd)" })
 map("n", "<leader>fp", function()
   snacks.picker.projects()
 end, { desc = "Projects" })
+-- Inspect project Git changes and GitHub issues/PRs; uppercase GitHub keys include closed entries.
 map("n", "<leader>gd", function()
   snacks.picker.git_diff({ cwd = root.get() })
 end, { desc = "Git Diff (hunks)" })
@@ -224,6 +240,7 @@ end, { desc = "GitHub Pull Requests (open)" })
 map("n", "<leader>gP", function()
   snacks.picker.gh_pr({ cwd = root.get(), state = "all" })
 end, { desc = "GitHub Pull Requests (all)" })
+-- Search buffer text or project files; uppercase grep/word variants use the current directory.
 map("n", "<leader>sb", function()
   snacks.picker.lines()
 end, { desc = "Buffer Lines" })
@@ -242,6 +259,7 @@ end, { desc = "Selection / Word (Root Dir)" })
 map({ "n", "x" }, "<leader>sW", function()
   snacks.picker.grep_word({ cwd = vim.fn.getcwd() })
 end, { desc = "Selection / Word (cwd)" })
+-- Browse editor state and documentation through the corresponding picker sources.
 map("n", '<leader>s"', function()
   snacks.picker.registers()
 end, { desc = "Registers" })
@@ -300,6 +318,7 @@ map("n", "<leader>uC", function()
   snacks.picker.colorschemes()
 end, { desc = "Colorschemes" })
 
+-- Open the explorer at the project root or cwd, with shorter aliases for both choices.
 map("n", "<leader>fe", function()
   snacks.explorer({ cwd = root.get() })
 end, { desc = "Explorer (Root Dir)" })
@@ -308,6 +327,7 @@ map("n", "<leader>fE", function()
 end, { desc = "Explorer (cwd)" })
 map("n", "<leader>e", "<leader>fe", { desc = "Explorer (Root Dir)", remap = true })
 map("n", "<leader>E", "<leader>fE", { desc = "Explorer (cwd)", remap = true })
+-- Toggle or select a saved scratch buffer; the profiler key opens its dedicated scratch view.
 map("n", "<leader>.", function()
   snacks.scratch()
 end, { desc = "Toggle Scratch Buffer" })
