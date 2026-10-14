@@ -2,6 +2,7 @@
 -- Shared display data only; edit these glyphs directly.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 return {
+  -- General UI glyphs and icons for filetypes that need a custom display symbol.
   misc = {
     dots = "󰇘",
   },
@@ -10,6 +11,7 @@ return {
     gh = " ",
     ["markdown.gh"] = " ",
   },
+  -- Debugger signs; table values also specify the sign and optional line highlights.
   dap = {
     Stopped = { "󰁕 ", "DiagnosticWarn", "DapStoppedLine" },
     Breakpoint = " ",
@@ -17,6 +19,7 @@ return {
     BreakpointRejected = { " ", "DiagnosticError" },
     LogPoint = ".>",
   },
+  -- Shared diagnostic severity and Git change symbols used by the UI modules.
   diagnostics = {
     Error = " ",
     Warn = " ",
@@ -28,6 +31,7 @@ return {
     modified = " ",
     removed = " ",
   },
+  -- Completion/LSP symbol kinds, with additional labels used by AI providers.
   kinds = {
     Array = " ",
     Boolean = "󰨙 ",

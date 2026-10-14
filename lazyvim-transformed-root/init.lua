@@ -5,6 +5,7 @@
 -- Each module repeats its dependencies; optional modules below are ordinary commented calls.
 -- Docs: https://neovim.io/doc/user/pack/ and https://neovim.io/doc/user/lsp/
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
+-- Check the minimum supported Neovim version before configuring plugins.
 if vim.fn.has("nvim-0.12.6") == 0 then
   error("This configuration requires Neovim >= 0.12.6")
 end
@@ -13,6 +14,8 @@ end
 local config_dir = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":p:h")
 vim.opt.runtimepath:prepend(config_dir)
 
+-- Establish editor options and the UI services used by the mappings below.
+-- Every module runs immediately here; this order is the configuration's startup flow.
 require("config.options") -- rg for :grep; optional clipboard provider / Nerd Font.
 require("plugins.icons") -- mini.icons; Nerd Font recommended.
 require("plugins.colorscheme") -- TokyoNight; no external tools.
@@ -29,6 +32,7 @@ require("plugins.coding") -- mini.pairs/ai, ts-comments, lazydev; no external to
 -- Dependencies: Neovim 0.12.6; Git for vim.pack; cmp-tabnine; blink.compat for Blink (default) or nvim-cmp; manually installed Tabnine binary; curl/unzip or PowerShell for manual installer.
 -- require("extras.ai.tabnine")
 
+-- Configure completion before LSP setup asks Blink for client capabilities.
 require("plugins.blink") -- Blink + friendly-snippets; Lua fuzzy matching, no binary build/download.
 -- require("extras.coding.nvim-cmp") -- Replace Blink above and its capability call in plugins/lsp.lua.
 
@@ -45,6 +49,7 @@ require("plugins.linting") -- nvim-lint; fish on PATH for Fish buffers.
 -- Dependencies: Neovim 0.12.6; Git for vim.pack; neoconf.nvim; optional jsonc parser; no external executable.
 -- require("extras.lsp.neoconf")
 
+-- Enable native language clients after completion, formatting, and linting are ready.
 require("plugins.lsp") -- nvim-lspconfig definitions + native LSP; lua-language-server on PATH.
 require("plugins.persistence") -- Persistence; writes sessions in Neovim's state directory.
 

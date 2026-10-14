@@ -21,6 +21,8 @@ function M.get(buf)
   end
   local name = vim.api.nvim_buf_get_name(buf)
   local path = name ~= "" and normalize(name) or normalize(vim.uv.cwd() or ".")
+  -- Gather roots and workspace folders from attached clients, retaining only
+  -- directories that contain this buffer's path.
   local roots = {}
   for _, client in ipairs(vim.lsp.get_clients({ bufnr = buf })) do
     if client.name ~= "copilot" then
@@ -40,6 +42,7 @@ function M.get(buf)
       end
     end
   end
+  -- More specific containing directories win over broader workspace roots.
   table.sort(roots, function(a, b)
     return #a > #b
   end)

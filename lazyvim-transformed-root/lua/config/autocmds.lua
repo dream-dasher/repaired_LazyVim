@@ -3,11 +3,14 @@
 -- Docs: https://neovim.io/doc/user/autocmd/
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+--- Create a group prefixed with config_, clearing its previous handlers.
+--- This keeps re-sourcing the file from registering the same handlers twice.
 local function augroup(name)
   return vim.api.nvim_create_augroup("config_" .. name, { clear = true })
 end
 
--- Check if we need to reload the file when it changed
+-- Check for external file changes when focus returns, a terminal closes, or
+-- terminal mode is left. Skip this check while the current buffer is a nofile UI.
 vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   group = augroup("checktime"),
   callback = function()
@@ -17,7 +20,7 @@ vim.api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   end,
 })
 
--- Highlight on yank
+-- Briefly highlight copied text after a yank so its extent is easy to see.
 vim.api.nvim_create_autocmd("TextYankPost", {
   group = augroup("highlight_yank"),
   callback = function()
@@ -25,7 +28,8 @@ vim.api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
--- resize splits if window got resized
+-- Rebalance splits in every tab after the editor is resized, then return to
+-- the tab that was active before the resize.
 vim.api.nvim_create_autocmd({ "VimResized" }, {
   group = augroup("resize_splits"),
   callback = function()
@@ -35,7 +39,8 @@ vim.api.nvim_create_autocmd({ "VimResized" }, {
   end,
 })
 
--- go to last loc when opening a buffer
+-- Restore the saved cursor position once per buffer after reading a file.
+-- Skip commit messages and saved marks whose line no longer exists.
 vim.api.nvim_create_autocmd("BufReadPost", {
   group = augroup("last_loc"),
   callback = function(event)
@@ -53,7 +58,8 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
--- close some filetypes with <q>
+-- For these utility filetypes, hide the buffer from normal buffer switching
+-- and map q to close its window and delete the buffer.
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup("close_with_q"),
   pattern = {
@@ -76,6 +82,8 @@ vim.api.nvim_create_autocmd("FileType", {
   },
   callback = function(event)
     vim.bo[event.buf].buflisted = false
+    -- Wait until the current event finishes before installing the local mapping.
+    -- The buffer might have been deleted in the meantime.
     vim.schedule(function()
       if not vim.api.nvim_buf_is_valid(event.buf) then
         return
@@ -92,7 +100,7 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- make it easier to close man-files when opened inline
+-- Keep man-page buffers out of normal buffer switching by marking them unlisted.
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup("man_unlisted"),
   pattern = { "man" },
@@ -101,7 +109,7 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- wrap and check for spell in text filetypes
+-- Enable soft wrapping and spell checking for prose, markup, and commit messages.
 vim.api.nvim_create_autocmd("FileType", {
   group = augroup("wrap_spell"),
   pattern = { "text", "plaintex", "typst", "gitcommit", "markdown" },
@@ -111,7 +119,7 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- Fix conceallevel for json files
+-- Show JSON punctuation literally instead of allowing syntax rules to conceal it.
 vim.api.nvim_create_autocmd({ "FileType" }, {
   group = augroup("json_conceal"),
   pattern = { "json", "jsonc", "json5" },
@@ -120,7 +128,8 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
   end,
 })
 
--- Auto create dir when saving a file, in case some intermediate directory does not exist
+-- Before saving a local file, create any missing parent directories.
+-- Skip names that look like URLs; resolve existing symlinks before choosing a parent.
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
   group = augroup("auto_create_dir"),
   callback = function(event)
