@@ -8,10 +8,12 @@
 -- Vue/Angular/Astro/Svelte plugins use tsserver/vtsls APIs and do not transfer to the native tsc server.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Configure the native compiler's LSP mode for JavaScript and TypeScript buffers.
 vim.lsp.config("tsc", {
   filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
   settings = {
     ["js/ts"] = {
+      -- Show parameter/field hints while suppressing noisy inferred-type hints.
       inlayHints = {
         enumMemberValues = { enabled = true },
         functionLikeReturnTypes = { enabled = false },

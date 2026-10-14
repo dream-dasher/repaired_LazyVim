@@ -7,5 +7,6 @@
 -- to its vim.pack.add list and require("neotest-zig") to its adapters table.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Enable ZLS language support for Zig buffers.
 vim.lsp.config("zls", {})
 vim.lsp.enable({ "zls" })

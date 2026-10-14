@@ -7,6 +7,7 @@
 -- No plugin builds or automatic rebuilds run here.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load Telescope, its Lua dependency, and input/selection dialogs; the native sorter is optional.
 vim.pack.add({
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/nvim-telescope/telescope.nvim",
@@ -15,10 +16,12 @@ vim.pack.add({
 })
 local telescope = require("telescope")
 local actions = require("telescope.actions")
+-- Configure picker appearance, navigation/history keys, and hidden-file searches through rg.
 telescope.setup({
   defaults = {
     prompt_prefix = " ",
     selection_caret = " ",
+    -- Open selections in the first ordinary buffer window; return 0 to use the current window.
     get_selection_window = function()
       for _, window in ipairs(vim.api.nvim_list_wins()) do
         if vim.bo[vim.api.nvim_win_get_buf(window)].buftype == "" then
@@ -46,11 +49,14 @@ telescope.setup({
   },
 })
 -- telescope.load_extension("fzf") -- only after manual build
+-- Route vim.ui.select through Telescope, with the built-in selector as a fallback.
 require("dressing").setup({ select = { backend = { "telescope", "builtin" } } })
 local builtin, map = require("telescope.builtin"), vim.keymap.set
+--- Return the current project root using the shared LSP/marker/cwd fallback rules.
 local function root()
   return require("util.root").get()
 end
+-- Search files and contents relative to the current project root.
 for _, key in ipairs({ "<leader><space>", "<leader>ff" }) do
   map("n", key, function()
     builtin.find_files({ cwd = root() })
@@ -61,6 +67,7 @@ for _, key in ipairs({ "<leader>/", "<leader>sg" }) do
     builtin.live_grep({ cwd = root() })
   end, { desc = "Grep (root)" })
 end
+-- Provide cwd/config searches, cwd-filtered recent files, current-buffer diagnostics, and theme previews.
 map("n", "<leader>fF", function()
   builtin.find_files({ cwd = vim.uv.cwd() })
 end, { desc = "Find files (cwd)" })
@@ -79,6 +86,7 @@ end, { desc = "Buffer diagnostics" })
 map("n", "<leader>uC", function()
   builtin.colorscheme({ enable_preview = true })
 end, { desc = "Colorscheme preview" })
+-- Bind the remaining buffer, Git, history, diagnostics, and editor-state pickers.
 for key, name in pairs({
   [","] = "buffers",
   [":"] = "command_history",
@@ -114,6 +122,8 @@ for key, name in pairs({
     builtin[name]()
   end, { desc = "Search: " .. name })
 end
+-- Search the cursor word, or preserve the full visual region as the search text.
+-- Lowercase keys search the project root; uppercase keys search the current working directory.
 for key, use_root in pairs({ sw = true, sW = false }) do
   map({ "n", "x" }, "<leader>" .. key, function()
     local search = vim.fn.expand("<cword>")
@@ -124,8 +134,11 @@ for key, use_root in pairs({ sw = true, sW = false }) do
     builtin.grep_string({ cwd = use_root and root() or vim.uv.cwd(), search = search })
   end, { desc = "Search word/selection" })
 end
+-- Search all tracked comment keywords, or restrict results to TODO/FIX/FIXME.
 map("n", "<leader>st", "<cmd>TodoTelescope<cr>", { desc = "Todo" })
 map("n", "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", { desc = "Todo/Fix" })
+--- Install picker-based LSP navigation globally, or locally when a buffer is supplied.
+--- Reuse an existing window for the selected result when possible.
 local function lsp_maps(buffer)
   for key, name in pairs({
     gd = "lsp_definitions",
@@ -140,13 +153,16 @@ local function lsp_maps(buffer)
     end, { buffer = buffer, desc = "LSP: " .. name })
   end
 end
+-- Provide global LSP navigation defaults before any client attaches.
 lsp_maps()
+-- Replace the attaching buffer's core LSP mappings with Telescope navigation.
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("config_telescope_lsp", { clear = true }),
   callback = function(event)
     lsp_maps(event.buf)
   end,
 })
+-- Apply the same local mappings to clients/buffers that were already attached.
 for _, client in ipairs(vim.lsp.get_clients()) do
   for buffer in pairs(client.attached_buffers) do
     lsp_maps(buffer)

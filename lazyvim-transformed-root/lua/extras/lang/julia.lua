@@ -10,13 +10,16 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Prefer qualified completions and suppress missing-reference lint reports.
 vim.lsp.config("julials", { settings = { julia = { completionmode = "qualify", lint = { missingrefs = "none" } } } })
 vim.lsp.enable({ "julials" })
 
+-- Load LaTeX-symbol completion and adapt its nvim-cmp source for Blink.
 vim.pack.add({
   { src = "https://github.com/kdheepak/cmp-latex-symbols" },
   { src = "https://github.com/saghen/blink.compat", version = vim.version.range("2") },
 })
+-- Register the compatibility provider, then add it only to Julia completion.
 require("blink.compat").setup({})
 local blink = require("blink.cmp")
 blink.add_source_provider("latex_symbols", {

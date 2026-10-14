@@ -11,6 +11,8 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Configure SQL completion and Dadbod UI before their plugin scripts load.
+-- Store query files in the app data directory and keep query-on-save disabled.
 vim.g.omni_sql_default_compl_type = "syntax"
 vim.g.loaded_sql_completion = true
 local data = vim.fn.stdpath("data") .. "/dadbod_ui"
@@ -23,20 +25,25 @@ vim.g.db_ui_use_nvim_notify = true
 vim.g.db_ui_execute_on_save = false
 -- Example: vim.g.dbs = { dev = vim.env.DATABASE_URL }
 -- Keep credentials in environment variables or an ignored private file.
+-- Load database commands, the database browser, and metadata completion.
 vim.pack.add({
   { src = "https://github.com/tpope/vim-dadbod" },
   { src = "https://github.com/kristijanhusak/vim-dadbod-completion" },
   { src = "https://github.com/kristijanhusak/vim-dadbod-ui" },
 })
+-- Open the database browser explicitly through this toggle.
 vim.keymap.set("n", "<leader>D", "<cmd>DBUIToggle<cr>", { desc = "Toggle DBUI" })
+-- Register Dadbod metadata completion with Blink.
 local blink = require("blink.cmp")
 blink.add_source_provider("dadbod", { name = "Dadbod", module = "vim_dadbod_completion.blink" })
 local lint, conform = require("lint"), require("conform")
+-- Share database completion, SQLFluff linting, and formatting across SQL dialects.
 for _, ft in ipairs({ "sql", "mysql", "plsql" }) do
   blink.add_filetype_source(ft, "dadbod")
   lint.linters_by_ft[ft] = { "sqlfluff" }
   conform.formatters_by_ft[ft] = { "sqlfluff" }
 end
+-- Send buffer contents over stdin using the configured SQL dialect.
 conform.formatters.sqlfluff = { args = { "format", "--dialect=ansi", "-" } }
 -- Change the dialect above or use your project's .sqlfluff configuration.
 -- Optional Edgy: append { title="Database", ft="dbui", width=0.3, open=function() vim.cmd.DBUI() end }

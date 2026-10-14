@@ -5,7 +5,9 @@
 -- Conflicts: duplicate scope renderers should be disabled; Snacks scope navigation may remain enabled.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load the current-indent scope renderer.
 vim.pack.add({ "https://github.com/nvim-mini/mini.indentscope" })
+-- Disable scope rendering when a tool/dashboard buffer receives one of these filetypes.
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("config_mini_indentscope", { clear = true }),
   pattern = {
@@ -26,4 +28,5 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.b[event.buf].miniindentscope_disable = true
   end,
 })
+-- Draw a vertical scope guide, considering an adjacent less-indented line as a possible border.
 require("mini.indentscope").setup({ symbol = "│", options = { try_as_border = true } })

@@ -3,8 +3,10 @@
 -- Snacks for picker-backed navigation. Additional servers are documented by each language module.
 -- No server is installed here. Docs: https://neovim.io/doc/user/lsp/
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
+-- Add server definitions to the runtime; native vim.lsp configures and starts the servers.
 vim.pack.add({ "https://github.com/neovim/nvim-lspconfig" })
 local icons = require("config.icons")
+-- Limit symbol pickers to structural declarations; Markdown and help show all symbol kinds.
 local symbol_filter = {
   default = {
     "Class",
@@ -39,6 +41,7 @@ local symbol_filter = {
   },
 }
 
+-- Draw severity-sorted diagnostics with icons and text, updating after Insert mode ends.
 vim.diagnostic.config({
   underline = true,
   update_in_insert = false,
@@ -54,10 +57,12 @@ vim.diagnostic.config({
   },
 })
 
+-- Advertise Blink completion and file-rename support to every configured server.
 local capabilities = require("blink.cmp").get_lsp_capabilities({
   workspace = { fileOperations = { didRename = true, willRename = true } },
 })
 vim.lsp.config("*", { capabilities = capabilities })
+-- Enable Lua code lenses and selected inlay hints using the external Lua server.
 vim.lsp.config("lua_ls", {
   cmd = { "lua-language-server" },
   settings = {
@@ -79,6 +84,7 @@ vim.lsp.config("lua_ls", {
 })
 vim.lsp.enable("lua_ls")
 
+-- When a server attaches, add supported buffer actions and enable its hints and folding.
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("config_lsp_attach", { clear = true }),
   callback = function(event)
@@ -87,11 +93,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
       return
     end
     local buf = event.buf
+    --- Add a buffer-local mapping when this client supports the requested LSP method.
+    --- Omitting method installs the mapping unconditionally for this attached buffer.
     local function map(mode, lhs, rhs, desc, method)
       if not method or client:supports_method(method, buf) then
         vim.keymap.set(mode, lhs, rhs, { buffer = buf, silent = true, desc = desc })
       end
     end
+    -- Use Snacks pickers for locations and native LSP calls for hover, signatures and edits.
     map("n", "<leader>cl", function()
       Snacks.picker.lsp_config()
     end, "LSP Info")
@@ -113,12 +122,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
     map("i", "<C-k>", vim.lsp.buf.signature_help, "Signature Help", "textDocument/signatureHelp")
     map({ "n", "x" }, "<leader>ca", vim.lsp.buf.code_action, "Code Action", "textDocument/codeAction")
     map("n", "<leader>cr", vim.lsp.buf.rename, "Rename", "textDocument/rename")
+    -- Request source-wide actions; the import action is applied immediately when available.
     map({ "n", "x" }, "<leader>cA", function()
       vim.lsp.buf.code_action({ context = { only = { "source" }, diagnostics = {} } })
     end, "Source Action", "textDocument/codeAction")
     map("n", "<leader>co", function()
       vim.lsp.buf.code_action({ apply = true, context = { only = { "source.organizeImports" }, diagnostics = {} } })
     end, "Organize Imports", "textDocument/codeAction")
+    -- Offer file renaming only when the server can participate in the rename operation.
     if
       client:supports_method("workspace/willRenameFiles", buf)
       or client:supports_method("workspace/didRenameFiles", buf)
@@ -127,6 +138,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
         Snacks.rename.rename_file()
       end, "Rename File")
     end
+    -- Browse filtered symbols and the incoming or outgoing calls for the symbol at the cursor.
     map("n", "<leader>ss", function()
       Snacks.picker.lsp_symbols({ filter = symbol_filter })
     end, "LSP Symbols", "textDocument/documentSymbol")
@@ -139,6 +151,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     map("n", "gao", function()
       Snacks.picker.lsp_outgoing_calls()
     end, "Calls Outgoing", "textDocument/prepareCallHierarchy")
+    -- Navigate document highlights, honoring a count and allowing Alt keys to wrap around.
     if client:supports_method("textDocument/documentHighlight", buf) then
       map("n", "]]", function()
         Snacks.words.jump(vim.v.count1)
@@ -153,6 +166,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
         Snacks.words.jump(-vim.v.count1, true)
       end, "Previous Reference")
     end
+    -- Show inlay hints in ordinary file buffers, with Vue excluded from the default behavior.
     if
       vim.bo[buf].buftype == ""
       and vim.bo[buf].filetype ~= "vue"
@@ -160,13 +174,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
     then
       vim.lsp.inlay_hint.enable(true, { bufnr = buf })
     end
+    -- Prefer server-provided folds in every window currently showing this buffer.
     if client:supports_method("textDocument/foldingRange", buf) then
       for _, win in ipairs(vim.fn.win_findbuf(buf)) do
         vim.wo[win][0].foldmethod = "expr"
         vim.wo[win][0].foldexpr = "v:lua.vim.lsp.foldexpr()"
       end
     end
-    -- Automatic refresh is disabled; these maps explicitly run or refresh supported lenses.
+    -- These mappings explicitly run or refresh supported code lenses.
     map({ "n", "x" }, "<leader>cc", vim.lsp.codelens.run, "Run Codelens", "textDocument/codeLens")
     map("n", "<leader>cC", function()
       vim.lsp.codelens.refresh({ bufnr = buf })

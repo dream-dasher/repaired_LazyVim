@@ -6,17 +6,21 @@
 -- To add a dashboard shortcut, directly call the <leader>sz action from your chosen dashboard setup.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Set the Chezmoi Vim plugin's editing buffer mode and source directory before loading it.
 vim.g["chezmoi#use_tmp_buffer"] = 1
 vim.g["chezmoi#source_dir_path"] = vim.fs.joinpath(vim.uv.os_homedir(), ".local", "share", "chezmoi")
+-- Load Chezmoi editing support and its Lua dependency.
 vim.pack.add({
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/alker0/chezmoi.vim",
   "https://github.com/xvzc/chezmoi.nvim",
 })
+-- Keep automatic watching/forced apply disabled and report explicit open/apply operations.
 require("chezmoi").setup({
   edit = { watch = false, force = false },
   notification = { on_open = true, on_apply = true, on_watch = false },
 })
+-- List managed files as absolute paths and edit the selected file; cancellation does nothing.
 vim.keymap.set("n", "<leader>sz", function()
   local results = require("chezmoi.commands").list({
     args = { "--path-style", "absolute", "--include", "files", "--exclude", "externals" },

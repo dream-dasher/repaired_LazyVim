@@ -7,9 +7,13 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Make playbook/role execution helpers available before defining the mapping.
 vim.pack.add({ { src = "https://github.com/mfussenegger/nvim-ansible" } })
+-- Enable Ansible language support using the installed server definition.
 vim.lsp.config("ansiblels", {})
 vim.lsp.enable("ansiblels")
+-- Add the run mapping only when a buffer is identified as Ansible YAML.
+-- The mapping executes the playbook or role when invoked.
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("AnsibleMappings", { clear = true }),
   pattern = "yaml.ansible",

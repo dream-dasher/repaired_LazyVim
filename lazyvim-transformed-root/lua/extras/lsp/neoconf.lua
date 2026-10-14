@@ -7,6 +7,7 @@
 -- Dropped: automatic server interception/live reload. Restart the affected server after changing settings.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load project-setting access without automatic LSP interception or live reconfiguration.
 vim.pack.add({ "https://github.com/folke/neoconf.nvim" })
 require("neoconf").setup({
   live_reload = false,

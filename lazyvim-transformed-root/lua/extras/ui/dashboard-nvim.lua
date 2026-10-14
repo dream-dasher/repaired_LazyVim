@@ -5,12 +5,14 @@
 -- Dropped: plugin-manager buttons/statistics and manager-window reopen events.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Initialize the Doom-style dashboard while retaining the editor statusline.
 vim.pack.add({ "https://github.com/nvimdev/dashboard-nvim" })
 require("dashboard").setup({
   theme = "doom",
   hide = { statusline = false },
   config = {
     header = { "", "", "N E O V I M", "", "" },
+    -- Button actions call the configured picker/session plugins only when selected.
     center = {
       { action = "lua Snacks.picker.files()", desc = " Find file", icon = " ", key = "f" },
       { action = "ene | startinsert", desc = " New file", icon = " ", key = "n" },

@@ -8,6 +8,7 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Load Helm filetype/template helpers, then enable the native Helm server.
 vim.pack.add({ { src = "https://github.com/qvalentin/helm-ls.nvim" } })
 require("helm-ls").setup({})
 vim.lsp.config("helm_ls", {})

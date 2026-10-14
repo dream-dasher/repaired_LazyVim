@@ -7,8 +7,10 @@
 -- For Prettier formatting enable extras.formatting.prettier and the assignment below.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Enable Ember project language support using its native server definition.
 vim.lsp.config("ember", {})
 vim.lsp.enable("ember")
+-- Recognize embedded Glimmer templates in JavaScript and TypeScript files.
 vim.filetype.add({ extension = { gjs = "javascript.glimmer", gts = "typescript.glimmer" } })
 -- Uncomment if Prettier owns formatting in this project:
 -- require("conform").formatters_by_ft.glimmer = { "prettier" }

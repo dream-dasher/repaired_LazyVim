@@ -5,5 +5,6 @@
 -- No startup profiling or subprocess is launched by this module itself.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Set the number of profiling runs before loading the manually invoked StartupTime command.
 vim.g.startuptime_tries = 10
 vim.pack.add({ "https://github.com/dstein64/vim-startuptime" })

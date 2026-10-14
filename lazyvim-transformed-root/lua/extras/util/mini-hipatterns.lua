@@ -5,7 +5,9 @@
 -- Conflicts: avoid duplicate hex/Tailwind color rendering from another highlighter/LSP.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load pattern-based color previews without an external color server.
 vim.pack.add({ "https://github.com/nvim-mini/mini.hipatterns" })
+-- Store Tailwind v3 color families by numeric shade, as RGB hex strings without the # prefix.
 local colors = {
   slate = {
     [50] = "f8fafc",
@@ -317,7 +319,9 @@ local colors = {
 }
 
 local hi = require("mini.hipatterns")
+-- Remember generated Tailwind highlight groups until a colorscheme change clears their styles.
 local highlight_cache = {}
+-- Limit Tailwind class previews to filetypes where utility classes are commonly used.
 local tailwind_filetypes = {
   "astro",
   "css",
@@ -333,17 +337,21 @@ local tailwind_filetypes = {
   "vue",
 }
 local tailwind_style = "full" -- Change to "compact" to highlight only the color portion.
+-- Forget generated groups after colorscheme changes so their colors are recreated on the next match.
 vim.api.nvim_create_autocmd("ColorScheme", {
   group = vim.api.nvim_create_augroup("config_hipatterns", { clear = true }),
   callback = function()
     highlight_cache = {}
   end,
 })
+-- Register full hex, shorthand hex, and Tailwind previews at a high extmark priority.
 hi.setup({
   highlighters = {
     hex_color = hi.gen_highlighter.hex_color({ priority = 2000 }),
+    -- Match exactly three hex digits; frontier checks avoid matching longer alphanumeric strings.
     shorthand = {
       pattern = "()#%x%x%x()%f[^%x%w]",
+      -- Skip the literal #add, expand RGB shorthand by doubling each digit, and return its color group.
       group = function(_, _, data)
         local match = data.full_match
         if match == "#add" then
@@ -355,6 +363,7 @@ hi.setup({
       extmark_opts = { priority = 2000 },
     },
     tailwind = {
+      -- Return no pattern for unrelated filetypes; compact mode highlights only color/shade text.
       pattern = function()
         if not vim.tbl_contains(tailwind_filetypes, vim.bo.filetype) then
           return
@@ -364,6 +373,7 @@ hi.setup({
         end
         return "%f[%w:-]()[%w:-]+%-[a-z%-]+%-%d+()%f[^%w:-]"
       end,
+      -- Resolve the matched class to the fixed palette; unknown colors/shades receive no highlight.
       group = function(_, _, match)
         local color, shade = match.full_match:match("[%w-]+%-([a-z%-]+)%-(%d+)")
         shade = tonumber(shade)
@@ -372,6 +382,7 @@ hi.setup({
           return
         end
         local group = "MiniHipatternsTailwind" .. color .. shade
+        -- Define each group once, choosing a contrasting foreground shade for readable text.
         if not highlight_cache[group] then
           highlight_cache[group] = true
           local foreground_shade = shade == 500 and 950 or shade < 500 and 900 or 100

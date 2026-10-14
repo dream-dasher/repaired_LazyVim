@@ -6,24 +6,29 @@
 -- File edits/renames are performed only on explicit synchronization.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Set up an editable file browser with preview panes while retaining the default explorer.
 vim.pack.add({ "https://github.com/nvim-mini/mini.files" })
 local files = require("mini.files")
 files.setup({
   windows = { preview = true, width_focus = 30, width_preview = 30 },
   options = { use_as_default_explorer = false },
 })
+-- Open the browser at the current file or working directory, restoring its latest explorer state.
 vim.keymap.set("n", "<leader>fm", function()
   files.open(vim.api.nvim_buf_get_name(0), true)
 end, { desc = "Files (current directory)" })
 vim.keymap.set("n", "<leader>fM", function()
   files.open(vim.uv.cwd(), true)
 end, { desc = "Files (cwd)" })
+-- Share the hidden-file visibility setting across file-browser buffers.
 local hidden = true
+-- Add browser-local visibility, working-directory, and split-opening actions when a pane is created.
 vim.api.nvim_create_autocmd("User", {
   group = vim.api.nvim_create_augroup("config_mini_files", { clear = true }),
   pattern = "MiniFilesBufferCreate",
   callback = function(event)
     local buffer = event.data.buf_id
+    -- Refresh the listing with all entries or only names that do not start with a dot.
     vim.keymap.set("n", "g.", function()
       hidden = not hidden
       files.refresh({
@@ -34,12 +39,15 @@ vim.api.nvim_create_autocmd("User", {
         },
       })
     end, { buffer = buffer, desc = "Toggle hidden files" })
+    -- Change cwd to the selected directory, or to the selected file's parent, if an entry exists.
     vim.keymap.set("n", "gc", function()
       local entry = files.get_fs_entry()
       if entry then
         vim.fn.chdir(entry.fs_type == "directory" and entry.path or vim.fs.dirname(entry.path))
       end
     end, { buffer = buffer, desc = "Set cwd" })
+    -- Create a target-window split, then enter the selected directory in the browser
+    -- or open the selected file in the split. Uppercase variants close after opening a file.
     for key, direction in pairs({
       ["<C-w>s"] = "horizontal",
       ["<C-w>v"] = "vertical",
@@ -47,6 +55,7 @@ vim.api.nvim_create_autocmd("User", {
       ["<C-w>V"] = "vertical",
     }) do
       vim.keymap.set("n", key, function()
+        -- An explorer without a target window cannot open a split, so leave it unchanged.
         local state = files.get_explorer_state()
         if not state or not state.target_window then
           return
@@ -60,6 +69,7 @@ vim.api.nvim_create_autocmd("User", {
     end
   end,
 })
+-- Notify LSP clients through Snacks after the browser has performed a file rename.
 vim.api.nvim_create_autocmd("User", {
   pattern = "MiniFilesActionRename",
   callback = function(event)

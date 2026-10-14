@@ -5,6 +5,7 @@
 -- Conflicts: symbol breadcrumbs from Trouble/Aerial can duplicate Navic in lualine; choose one component.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Configure quiet, icon-based LSP breadcrumbs with at most five levels of context.
 vim.pack.add({ "https://github.com/SmiteshP/nvim-navic" })
 vim.g.navic_silence = true
 local navic = require("nvim-navic")
@@ -15,11 +16,13 @@ navic.setup({
   icons = require("config.icons").kinds,
   lazy_update_context = true,
 })
+--- Attach breadcrumb tracking only if this client supports document symbols for the buffer.
 local function attach(client, buffer)
   if client:supports_method("textDocument/documentSymbol", buffer) then
     navic.attach(client, buffer)
   end
 end
+-- Attach Navic to a newly connected LSP client when that client still exists and supports symbols.
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("config_navic", { clear = true }),
   callback = function(event)
@@ -29,6 +32,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end
   end,
 })
+-- Attach to suitable clients/buffers that were already active before this module loaded.
 for _, client in ipairs(vim.lsp.get_clients()) do
   for buffer in pairs(client.attached_buffers) do
     attach(client, buffer)

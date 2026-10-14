@@ -6,6 +6,7 @@
 -- VS Code launch.json support is native to nvim-dap; commented JSON decoding uses plenary.json.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load DAP, its UI/virtual-text companions, and the supporting Lua libraries.
 vim.pack.add({
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/nvim-neotest/nvim-nio",
@@ -13,17 +14,21 @@ vim.pack.add({
   "https://github.com/rcarriga/nvim-dap-ui",
   "https://github.com/theHamsta/nvim-dap-virtual-text",
 })
+-- Set up debugger panes and inline values; language modules supply the actual adapters.
 local dap, ui = require("dap"), require("dapui")
 ui.setup({})
 require("nvim-dap-virtual-text").setup({})
+-- Define the stopped-line highlight and breakpoint signs, preserving optional per-sign styles.
 vim.api.nvim_set_hl(0, "DapStoppedLine", { default = true, link = "Visual" })
 for name, sign in pairs(require("config.icons").dap) do
   sign = type(sign) == "table" and sign or { sign }
   vim.fn.sign_define("Dap" .. name, { text = sign[1], texthl = sign[2] or "DiagnosticInfo", linehl = sign[3] })
 end
+-- Accept comments in launch.json by stripping them before native JSON decoding.
 require("dap.ext.vscode").json_decode = function(str)
   return vim.json.decode(require("plenary.json").json_strip_comments(str))
 end
+-- Open debugger panes when a session initializes and close them on termination or exit.
 dap.listeners.after.event_initialized["config_dap_ui"] = function()
   ui.open()
 end
@@ -33,12 +38,15 @@ end
 dap.listeners.before.event_exited["config_dap_ui"] = function()
   ui.close()
 end
+-- Provide conditional breakpoints and a launch action that asks for command-line arguments.
 local map = vim.keymap.set
 map("n", "<leader>dB", function()
   dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
 end, { desc = "Conditional breakpoint" })
 map("n", "<leader>da", function()
   dap.continue({
+    -- Copy the chosen launch configuration; resolve default args without mutating the original.
+    -- Java expects the entered string, while other adapters receive a split argument list.
     before = function(config)
       config = vim.deepcopy(config)
       local args = type(config.args) == "function" and config.args() or config.args or {}
@@ -48,6 +56,7 @@ map("n", "<leader>da", function()
     end,
   })
 end, { desc = "Debug with arguments" })
+-- Bind common execution, stepping, stack-frame, and breakpoint actions under <leader>d.
 for key, action in pairs({
   db = "toggle_breakpoint",
   dc = "continue",
@@ -66,6 +75,7 @@ for key, action in pairs({
     dap[action]()
   end, { desc = "Debug: " .. action })
 end
+-- Expose the REPL, session list, value inspection, UI visibility, and expression evaluation.
 map("n", "<leader>dr", function()
   dap.repl.toggle()
 end, { desc = "Debug REPL" })

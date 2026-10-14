@@ -7,7 +7,9 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Load the local schema catalog used for YAML validation and completion.
 vim.pack.add({ { src = "https://github.com/b0o/SchemaStore.nvim" } })
+-- Configure line-based folding, validation, formatting, and schema lookup.
 vim.lsp.config("yamlls", {
   capabilities = {
     textDocument = { foldingRange = {
@@ -16,6 +18,7 @@ vim.lsp.config("yamlls", {
     } },
   },
   settings = {
+    -- Disable telemetry and use SchemaStore.nvim instead of server-side fetching.
     redhat = { telemetry = { enabled = false } },
     yaml = {
       keyOrdering = false,

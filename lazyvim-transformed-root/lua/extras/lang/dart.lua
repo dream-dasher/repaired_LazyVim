@@ -7,8 +7,10 @@
 -- to its vim.pack.add list and require("neotest-dart") to its adapters table.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Enable the Dart SDK language server for Dart buffers.
 vim.lsp.config("dartls", {})
 vim.lsp.enable({ "dartls" })
 
+-- Format Dart through the SDK command configured by Conform.
 local conform = require("conform")
 conform.formatters_by_ft["dart"] = { "dart_format" }

@@ -9,6 +9,7 @@
 -- Optional Blink mentions: manually add Kaiser-Yang/blink-cmp-avante URL and module='blink-cmp-avante' provider to plugins/blink.lua.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Make Avante and its Lua dependencies available; native libraries are installed manually.
 vim.pack.add({
   "https://github.com/nvim-lua/plenary.nvim",
   "https://github.com/MunifTanjim/nui.nvim",
@@ -16,11 +17,13 @@ vim.pack.add({
   "https://github.com/ColinKennedy/mega.cmdparse",
   "https://github.com/yetone/avante.nvim",
 })
+-- Use the existing Copilot provider and keep all Avante mappings explicit below.
 require("avante").setup({
   provider = "copilot",
   selection = { hint_display = "none" },
   behaviour = { auto_set_keymaps = false },
 })
+-- Expose chat, editing, history, and provider commands in normal and visual mode.
 for key, command in pairs({
   aa = "AvanteAsk",
   ac = "AvanteChat",

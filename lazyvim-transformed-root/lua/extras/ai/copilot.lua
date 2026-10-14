@@ -7,7 +7,9 @@
 -- Uses Alt-l to accept so Blink's Tab/snippet mappings remain explicit. For Blink menu integration, manually add blink-copilot URL/provider in plugins/blink.lua and disable suggestion.enabled here.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Make the Copilot client available without installing its server binary.
 vim.pack.add({ "https://github.com/zbirenbaum/copilot.lua" })
+-- Require an existing server path before setup so the plugin cannot download another one.
 local server = vim.fn.exepath("copilot-language-server")
 if server == "" then
   vim.notify(
@@ -18,6 +20,7 @@ if server == "" then
 end
 -- Prevent a second Copilot client from the native LSP definition.
 vim.lsp.enable("copilot", false)
+-- Show automatic inline suggestions, including in Markdown/help, with explicit Alt keys.
 require("copilot").setup({
   server = { type = "binary", custom_server_filepath = server },
   suggestion = {
@@ -28,12 +31,14 @@ require("copilot").setup({
   panel = { enabled = false },
   filetypes = { markdown = true, help = true },
 })
+-- Hide inline Copilot suggestions while Blink displays its completion menu.
 vim.api.nvim_create_autocmd("User", {
   pattern = "BlinkCmpMenuOpen",
   callback = function()
     vim.b.copilot_suggestion_hidden = true
   end,
 })
+-- Restore inline Copilot suggestions when Blink closes its completion menu.
 vim.api.nvim_create_autocmd("User", {
   pattern = "BlinkCmpMenuClose",
   callback = function()

@@ -8,8 +8,10 @@
 -- Server definition: https://github.com/neovim/nvim-lspconfig/blob/master/lsp/astro.lua
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Extend vtsls initialization for Astro while keeping earlier integrations.
 local previous_before_init = vim.lsp.config.vtsls.before_init
 vim.lsp.config("vtsls", {
+  -- Add the Astro tsserver plugin before each TypeScript client initializes.
   before_init = function(params, config)
     if previous_before_init then
       previous_before_init(params, config)
@@ -17,6 +19,7 @@ vim.lsp.config("vtsls", {
     -- Edit this location for global/custom npm layouts; default is project-local.
     local location = vim.env.NVIM_ASTRO_TS_PLUGIN
       or vim.fs.joinpath(config.root_dir or vim.fn.getcwd(), "node_modules", "@astrojs/ts-plugin")
+    -- Append to existing tsserver plugins so framework extras can coexist.
     local settings = config.settings.vtsls
     settings.tsserver = settings.tsserver or {}
     settings.tsserver.globalPlugins = settings.tsserver.globalPlugins or {}
@@ -27,6 +30,7 @@ vim.lsp.config("vtsls", {
     })
   end,
 })
+-- Enable Astro-specific language support alongside the TypeScript client.
 vim.lsp.config("astro", {})
 vim.lsp.enable("astro")
 -- Enable with extras.formatting.prettier if Prettier owns formatting:

@@ -6,4 +6,5 @@
 -- Black: https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Replace the Python formatter list with Black; diagnostics and code actions remain independent.
 require("conform").formatters_by_ft.python = { "black" }

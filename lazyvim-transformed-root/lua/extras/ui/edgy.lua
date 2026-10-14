@@ -7,13 +7,16 @@
 -- For Telescope selection, set get_selection_window=function()require('edgy').goto_main();return 0 end directly in telescope.lua.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load pane management and retain screen positions while sidebars resize.
 vim.pack.add({ "https://github.com/folke/edgy.nvim" })
 vim.opt.splitkeep = "screen"
+-- Place eligible tool windows along editor edges, leaving unrelated windows unmanaged.
 require("edgy").setup({
   bottom = {
     {
       ft = "noice",
       size = { height = 0.4 },
+      -- Manage split Noice windows only; floating popups retain their own layout.
       filter = function(_, win)
         return vim.api.nvim_win_get_config(win).relative == ""
       end,
@@ -22,6 +25,7 @@ require("edgy").setup({
     {
       ft = "help",
       size = { height = 20 },
+      -- Accept actual help buffers rather than every buffer carrying the help filetype.
       filter = function(buf)
         return vim.bo[buf].buftype == "help"
       end,
@@ -30,6 +34,7 @@ require("edgy").setup({
     {
       ft = "snacks_terminal",
       size = { height = 0.4 },
+      -- Manage only bottom, editor-relative Snacks terminals with window metadata.
       filter = function(_, win)
         return vim.w[win].snacks_win
           and vim.w[win].snacks_win.position == "bottom"
@@ -38,6 +43,7 @@ require("edgy").setup({
     },
     {
       ft = "trouble",
+      -- Manage bottom Trouble splits, excluding its preview windows and other layouts.
       filter = function(_, win)
         return vim.w[win].trouble
           and vim.w[win].trouble.position == "bottom"
@@ -46,6 +52,7 @@ require("edgy").setup({
       end,
     },
   },
+  -- Keep test summaries on the left and optional symbol/chat/task panes on explicit sides.
   left = {
     { title = "Neotest summary", ft = "neotest-summary" },
     -- { title = "Neo-tree", ft = "neo-tree", pinned = true, open = "Neotree show filesystem" },
@@ -57,6 +64,7 @@ require("edgy").setup({
     -- { title = "Copilot Chat", ft = "copilot-chat", size = { width = 50 } },
     -- { title = "Overseer", ft = "OverseerList", open = function() require("overseer").open() end },
   },
+  -- Resize the selected managed pane by two columns or rows with Ctrl-arrow keys.
   keys = {
     ["<C-Right>"] = function(win)
       win:resize("width", 2)
@@ -72,6 +80,7 @@ require("edgy").setup({
     end,
   },
 })
+-- Toggle managed sidebars or select one to focus.
 vim.keymap.set("n", "<leader>ue", function()
   require("edgy").toggle()
 end, { desc = "Toggle sidebars" })

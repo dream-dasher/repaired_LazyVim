@@ -5,6 +5,7 @@
 -- Conflicts: Neo-tree replaces these keys; choose one module for <leader>e/E.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Open the configured Snacks explorer at project root/cwd and expose shorter aliases.
 vim.keymap.set("n", "<leader>fe", function()
   Snacks.explorer({ cwd = require("util.root").get() })
 end, { desc = "Explorer (root)" })

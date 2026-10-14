@@ -7,9 +7,11 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Enable saving sessions on exit; restoration remains an explicit user action.
 vim.pack.add({ { src = "https://github.com/folke/persistence.nvim" } })
 local persistence = require("persistence")
 persistence.setup({})
+-- Restore this directory's session, choose another, restore the latest, or stop saving.
 vim.keymap.set("n", "<leader>qs", function()
   persistence.load()
 end, { desc = "Restore Session" })

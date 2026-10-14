@@ -5,4 +5,5 @@
 -- Conflicts: use either Blink or extras.coding.nvim-cmp, never both.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Reuse the default Blink module; require caches it if it has already run.
 require("plugins.blink")

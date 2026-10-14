@@ -11,6 +11,7 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Load Java-specific attachment, refactoring, and optional debugging helpers.
 vim.pack.add({ { src = "https://github.com/mfussenegger/nvim-jdtls" } })
 -- Single owner: jdtls.start_or_attach below; do not also vim.lsp.enable("jdtls").
 local jdtls = require("jdtls")
@@ -18,23 +19,31 @@ local bundles = {} -- Put absolute paths to your manually installed debug/test J
 -- Example: vim.list_extend(bundles, vim.fn.glob("/path/to/java-debug/com.microsoft.java.debug.plugin-*.jar", false, true))
 -- Example: vim.list_extend(bundles, vim.fn.glob("/path/to/java-test/server/*.jar", false, true))
 -- Exclude jacocoagent.jar and com.microsoft.java.test.runner-jar-with-dependencies.jar from test bundles.
+--- Start or reuse JDT LS for the Java buffer reported by the FileType event.
+--- Use a build/repository root or the file directory, with a separate cache workspace per root.
 local function attach(event)
+  -- Discover the project from the buffer, falling back for standalone Java files.
   local root = vim.fs.root(
     event.buf,
     { "settings.gradle", "settings.gradle.kts", "pom.xml", "build.gradle", "build.gradle.kts", ".git" }
   ) or vim.fs.dirname(vim.api.nvim_buf_get_name(event.buf))
+  -- Skip buffers whose file has no usable project directory.
   if not root or root == "" then
     return
   end
+  -- Combine a readable project name with a root hash to avoid cache-name collisions.
   local project = vim.fs.basename(root) .. "-" .. vim.fn.sha256(root):sub(1, 12)
   local data_dir = vim.fn.stdpath("cache") .. "/jdtls/" .. project .. "/workspace"
+  -- JDT LS owns this client lifecycle; supply completion and optional Java bundles.
   jdtls.start_or_attach({
     cmd = { "jdtls", "-data", data_dir },
     root_dir = root,
     capabilities = require("blink.cmp").get_lsp_capabilities(),
     init_options = { bundles = bundles },
     settings = { java = { inlayHints = { parameterNames = { enabled = "all" } } } },
+    -- Install Java commands only in a buffer successfully attached to JDT LS.
     on_attach = function(_, buf)
+      -- Map normal-mode refactorings, navigation, and import organization.
       for lhs, entry in pairs({
         ["<leader>cxv"] = { jdtls.extract_variable_all, "Extract Variable" },
         ["<leader>cxc"] = { jdtls.extract_constant, "Extract Constant" },
@@ -44,6 +53,7 @@ local function attach(event)
       }) do
         vim.keymap.set("n", lhs, entry[1], { buffer = buf, desc = entry[2] })
       end
+      -- Pass true for refactorings that operate on the selected visual range.
       for lhs, fn in pairs({
         ["<leader>cxm"] = "extract_method",
         ["<leader>cxv"] = "extract_variable_all",
@@ -56,6 +66,7 @@ local function attach(event)
           { buffer = buf, desc = "Java " .. fn }
         )
       end
+      -- Debugging needs both supplied Java bundles and the optional DAP module.
       if #bundles > 0 and pcall(require, "dap") then
         jdtls.setup_dap({ hotcodereplace = "auto" })
         require("jdtls.dap").setup_dap_main_class_configs({})
@@ -67,11 +78,13 @@ local function attach(event)
     end,
   })
 end
+-- On Java filetype detection, attach or reuse the client for that project.
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("JavaLsp", { clear = true }),
   pattern = "java",
   callback = attach,
 })
+-- When DAP is available, offer attachment to an explicitly started remote JVM.
 local ok, dap = pcall(require, "dap")
 if ok then
   dap.configurations.java =

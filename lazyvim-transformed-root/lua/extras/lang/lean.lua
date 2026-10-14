@@ -10,6 +10,7 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Set proof-editing UI, abbreviations, and progress display before plugin loading.
 vim.g.lean_config = {
   mappings = true,
   abbreviations = { enable = true, leader = "\\", extra = { wknight = "♘" } },

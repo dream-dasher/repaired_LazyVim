@@ -6,6 +6,7 @@
 -- Removed: scanning external XDG config directories to choose parser installs.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Recognize common dotfile paths/extensions without scanning external config directories.
 vim.filetype.add({
   extension = { rasi = "rasi", rofi = "rasi", wofi = "rasi" },
   filename = { vifmrc = "vim" },
@@ -17,7 +18,9 @@ vim.filetype.add({
     ["%.env%.[%w_.-]+"] = "sh",
   },
 })
+-- Reuse Bash syntax parsing for Kitty config buffers.
 vim.treesitter.language.register("bash", "kitty")
+-- Enable shell LSP support only when its manually installed server is available.
 if vim.fn.executable("bash-language-server") == 1 then
   vim.lsp.config("bashls", { cmd = { "bash-language-server", "start" } })
   vim.lsp.enable("bashls")

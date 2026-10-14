@@ -6,6 +6,7 @@
 -- Both servers are preserved; if diagnostics overlap, remove regols or regal from enable().
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Enable both preserved Rego servers; remove one here if their features overlap.
 vim.lsp.config("regols", {})
 vim.lsp.config("regal", {})
 vim.lsp.enable({ "regols", "regal" })

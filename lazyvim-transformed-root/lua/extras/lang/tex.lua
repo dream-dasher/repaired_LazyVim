@@ -10,10 +10,15 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Leave K available for LSP hover and prefer pplatex for quickfix parsing if found.
+-- Set VimTeX globals before native package loading sources its plugin scripts.
 vim.g.vimtex_mappings_disable = { n = { "K" } }
 vim.g.vimtex_quickfix_method = vim.fn.executable("pplatex") == 1 and "pplatex" or "latexlog"
+-- Load VimTeX commands and inverse-search support at startup.
 vim.pack.add({ { src = "https://github.com/lervag/vimtex" } })
+-- Pair Texlab language support with a buffer-local VimTeX package-doc mapping.
 vim.lsp.config("texlab", {
+  -- Install the documentation mapping only in buffers attached to Texlab.
   on_attach = function(_, buf)
     vim.keymap.set(
       "n",
@@ -24,6 +29,8 @@ vim.lsp.config("texlab", {
   end,
 })
 vim.lsp.enable("texlab")
+-- On TeX filetype detection, stop native Tree-sitter highlighting so VimTeX
+-- owns syntax; pcall also tolerates buffers without active Tree-sitter highlighting.
 vim.api.nvim_create_autocmd("FileType", {
   group = vim.api.nvim_create_augroup("VimtexSyntax", { clear = true }),
   pattern = { "tex", "plaintex" },

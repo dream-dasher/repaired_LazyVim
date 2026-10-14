@@ -6,7 +6,9 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Install the alternative theme under its expected module name.
 vim.pack.add({ { src = "https://github.com/catppuccin/nvim", name = "catppuccin" } })
+-- Enable highlights for the configured plugins and underline LSP diagnostics.
 require("catppuccin").setup({
   auto_integrations = false,
   lsp_styles = {
@@ -29,4 +31,5 @@ require("catppuccin").setup({
     which_key = true,
   },
 })
+-- Apply the dark Mocha palette after configuring its integrations.
 vim.cmd.colorscheme("catppuccin-mocha")

@@ -6,9 +6,11 @@
 -- Commands can write GitHub issues/reviews when invoked; setup performs no authentication or remote write.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load the GitHub workflow and its pane/UI library.
 vim.pack.add({ "https://github.com/ldelossa/litee.nvim", "https://github.com/ldelossa/gh.nvim" })
 require("litee.lib").setup({})
 require("litee.gh").setup({})
+-- Group commit, issue, pull-request, review, and thread actions under <leader>G.
 for key, command in pairs({
   Gcc = "GHCloseCommit",
   Gce = "GHExpandCommit",

@@ -5,6 +5,7 @@
 -- Conflicts: Leap uses gs; choose distinct keys by directly editing this table.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load surround editing and keep its actions grouped under the gs prefix.
 vim.pack.add({ "https://github.com/nvim-mini/mini.surround" })
 require("mini.surround").setup({
   mappings = {

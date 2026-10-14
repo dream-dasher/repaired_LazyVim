@@ -8,13 +8,16 @@
 -- For Edgy: add {ft='copilot-chat',title='Copilot Chat',size={width=50}} directly to extras/ui/edgy.lua.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load the chat frontend and its Lua dependency; credentials come from existing Copilot auth.
 vim.pack.add({ "https://github.com/nvim-lua/plenary.nvim", "https://github.com/CopilotC-Nvim/CopilotChat.nvim" })
 local chat = require("CopilotChat")
+-- Open chat ready for input, with role labels and a window using 40% of the editor width.
 chat.setup({
   auto_insert_mode = true,
   headers = { user = "  " .. (vim.env.USER or "User") .. " ", assistant = "  Copilot ", tool = "󰊳  Tool " },
   window = { width = 0.4 },
 })
+-- Provide chat visibility, reset, and prompt-selection actions.
 local map = vim.keymap.set
 map({ "n", "x" }, "<leader>aa", function()
   chat.toggle()
@@ -22,6 +25,7 @@ end, { desc = "Toggle Copilot chat" })
 map({ "n", "x" }, "<leader>ax", function()
   chat.reset()
 end, { desc = "Clear Copilot chat" })
+-- Ask for a one-off prompt; cancelling or submitting an empty prompt sends nothing.
 map({ "n", "x" }, "<leader>aq", function()
   vim.ui.input({ prompt = "Quick chat: " }, function(input)
     if input and input ~= "" then
@@ -32,6 +36,7 @@ end, { desc = "Quick Copilot chat" })
 map({ "n", "x" }, "<leader>ap", function()
   chat.select_prompt()
 end, { desc = "Copilot prompt actions" })
+-- On the copilot-chat filetype event, unlist the buffer, remove numbers, and map submission.
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "copilot-chat",
   callback = function(event)

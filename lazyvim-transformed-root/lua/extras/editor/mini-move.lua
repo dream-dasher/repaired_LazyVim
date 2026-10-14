@@ -4,5 +4,6 @@
 -- Conflicts: <M-h/j/k/l> replace existing move mappings in normal/visual mode; edit mappings in setup if desired.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Enable the default Alt-h/j/k/l mappings for moving lines and visual selections.
 vim.pack.add({ "https://github.com/nvim-mini/mini.move" })
 require("mini.move").setup({})

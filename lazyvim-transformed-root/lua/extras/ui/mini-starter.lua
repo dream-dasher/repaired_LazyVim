@@ -5,11 +5,13 @@
 -- Dropped: plugin-manager items/statistics and manager-window lifecycle hooks.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Configure a centered startup screen whose single remaining match can be activated directly.
 vim.pack.add({ "https://github.com/nvim-mini/mini.starter" })
 local starter = require("mini.starter")
 starter.setup({
   evaluate_single = true,
   header = "N E O V I M",
+  -- Invoke file/search/session actions only when the corresponding startup item is selected.
   items = {
     {
       name = "Find file",
@@ -49,6 +51,7 @@ starter.setup({
     },
     { name = "Quit", action = "qa", section = "Editor" },
   },
+  -- Add a bullet to each item and center the assembled content in the startup window.
   content_hooks = { starter.gen_hook.adding_bullet("░ ", false), starter.gen_hook.aligning("center", "center") },
   footer = "Edit init.lua to customize your config",
 })

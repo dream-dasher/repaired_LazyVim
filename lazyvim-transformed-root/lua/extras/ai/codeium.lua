@@ -7,7 +7,9 @@
 -- Conflicts: choose one inline AI provider. To use Blink menu directly edit sources with module='codeium.blink', name='Codeium', async=true and disable virtual_text.enabled here.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load the Codeium client and its Lua dependency.
 vim.pack.add({ "https://github.com/nvim-lua/plenary.nvim", "https://github.com/Exafunction/windsurf.nvim" })
+-- Stop before setup if the manually installed server is missing, avoiding a download.
 local server = vim.fn.exepath("codeium-language-server")
 if server == "" then
   vim.notify(
@@ -16,6 +18,7 @@ if server == "" then
   )
   return
 end
+-- Show inline suggestions with Alt navigation instead of adding a completion-menu source.
 require("codeium").setup({
   tools = { language_server = server },
   enable_cmp_source = false,

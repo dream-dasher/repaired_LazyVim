@@ -4,8 +4,10 @@
 -- Conflicts: replaces native Ctrl-a/Ctrl-x increment maps. Edit groups below to change recognized values.
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Load structured increment/decrement support for values beyond plain numbers.
 vim.pack.add({ "https://github.com/monaqa/dial.nvim" })
 local augend = require("dial.augend")
+-- Define common number/date/word cycles plus syntax-specific values for each language.
 local groups = {
   default = {
     augend.integer.alias.decimal,
@@ -56,12 +58,14 @@ local groups = {
   lua = { augend.constant.new({ elements = { "and", "or" }, word = true, cyclic = true }) },
   python = { augend.constant.new({ elements = { "and", "or" } }) },
 }
+-- Append the common cycles to each language group before registering them.
 for name, group in pairs(groups) do
   if name ~= "default" then
     vim.list_extend(group, groups.default)
   end
 end
 require("dial.config").augends:register_group(groups)
+-- Choose a language group from the buffer filetype; unknown filetypes use the defaults.
 local by_ft = {
   css = "css",
   sass = "css",
@@ -76,6 +80,7 @@ local by_ft = {
   markdown = "markdown",
   python = "python",
 }
+-- Return Dial's key sequence for normal/visual increment and decrement, including g variants.
 for _, mode in ipairs({ "n", "x" }) do
   for _, mapping in ipairs({ { "<C-a>", "inc_" }, { "<C-x>", "dec_" }, { "g<C-a>", "inc_g" }, { "g<C-x>", "dec_g" } }) do
     vim.keymap.set(mode, mapping[1], function()

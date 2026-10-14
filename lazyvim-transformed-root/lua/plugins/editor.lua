@@ -8,6 +8,7 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Make search, movement, keymap help, Git signs and diagnostic/TODO views available.
 vim.pack.add({
   { src = "https://github.com/nvim-lua/plenary.nvim" },
   { src = "https://github.com/MagicDuck/grug-far.nvim" },
@@ -19,7 +20,9 @@ vim.pack.add({
 })
 
 local map = vim.keymap.set
+-- Keep the search-and-replace header compact.
 require("grug-far").setup({ headerMaxWidth = 80 })
+-- Start a temporary search-and-replace view, initially filtering by this file's extension.
 map({ "n", "x" }, "<leader>sr", function()
   local ext = vim.bo.buftype == "" and vim.fn.expand("%:e") or ""
   require("grug-far").open({
@@ -28,6 +31,7 @@ map({ "n", "x" }, "<leader>sr", function()
   })
 end, { desc = "Search and Replace" })
 
+-- Supply labeled jumps, syntax selections and remote operator targets through Flash.
 local flash = require("flash")
 flash.setup({})
 map({ "n", "x", "o" }, "s", function()
@@ -45,10 +49,12 @@ end, { desc = "Treesitter Search" })
 map("c", "<C-s>", function()
   flash.toggle()
 end, { desc = "Toggle Flash Search" })
+-- Grow a syntax selection with Ctrl-Space and shrink it with Backspace.
 map({ "n", "o", "x" }, "<C-space>", function()
   flash.treesitter({ actions = { ["<C-space>"] = "next", ["<BS>"] = "prev" } })
 end, { desc = "Treesitter Incremental Selection" })
 
+-- Name keymap prefixes and expand buffer/window choices from their current state.
 local wk = require("which-key")
 wk.setup({
   preset = "helix",
@@ -75,6 +81,7 @@ wk.setup({
       {
         "<leader>b",
         group = "buffer",
+        -- Generate buffer choices when the popup opens, including newly opened buffers.
         expand = function()
           return require("which-key.extras").expand.buf()
         end,
@@ -83,6 +90,7 @@ wk.setup({
         "<leader>w",
         group = "windows",
         proxy = "<C-w>",
+        -- List current windows and keep the usual Ctrl-W window commands available.
         expand = function()
           return require("which-key.extras").expand.win()
         end,
@@ -91,6 +99,7 @@ wk.setup({
     },
   },
 })
+-- Show buffer-local mappings or keep the window-command popup open for repeated commands.
 map("n", "<leader>?", function()
   wk.show({ global = false })
 end, { desc = "Buffer Keymaps (which-key)" })
@@ -115,6 +124,7 @@ for _, prefix in ipairs({ "a", "i", "an", "in", "al", "il" }) do
   end
 end
 
+-- Configure gutter marks for working-tree and staged changes.
 local gs = require("gitsigns")
 gs.setup({
   signs = {
@@ -132,10 +142,13 @@ gs.setup({
     topdelete = { text = "" },
     changedelete = { text = "▎" },
   },
+  -- Add Git actions only when Gitsigns attaches to a tracked or supported buffer.
   on_attach = function(buf)
+    --- Add a silent Git mapping to the buffer that Gitsigns has just attached to.
     local function bmap(mode, lhs, rhs, description)
       map(mode, lhs, rhs, { buffer = buf, desc = description, silent = true })
     end
+    -- Navigate Gitsigns hunks normally, but preserve native hunk navigation in diff windows.
     bmap("n", "]h", function()
       if vim.wo.diff then
         vim.cmd.normal({ "]c", bang = true })
@@ -150,6 +163,7 @@ gs.setup({
         gs.nav_hunk("prev")
       end
     end, "Previous Hunk")
+    -- Jump to either end of the hunk list, then expose staging, reset, blame and diff actions.
     bmap("n", "]H", function()
       gs.nav_hunk("last")
     end, "Last Hunk")
@@ -175,10 +189,12 @@ gs.setup({
     bmap({ "o", "x" }, "ih", ":<C-U>Gitsigns select_hunk<CR>", "Select Git Hunk")
   end,
 })
+-- Toggle the Git gutter independently of the buffer-local editing actions.
 map("n", "<leader>uG", function()
   gs.toggle_signs()
 end, { desc = "Toggle Git Signs" })
 
+-- Present diagnostics, symbols and location lists in Trouble; LSP locations open on the right.
 local trouble = require("trouble")
 trouble.setup({ modes = { lsp = { win = { position = "right" } } } })
 map("n", "<leader>xx", "<cmd>Trouble diagnostics toggle<cr>", { desc = "Diagnostics (Trouble)" })
@@ -187,6 +203,7 @@ map("n", "<leader>cs", "<cmd>Trouble symbols toggle<cr>", { desc = "Symbols (Tro
 map("n", "<leader>cS", "<cmd>Trouble lsp toggle<cr>", { desc = "LSP Locations (Trouble)" })
 map("n", "<leader>xL", "<cmd>Trouble loclist toggle<cr>", { desc = "Location List (Trouble)" })
 map("n", "<leader>xQ", "<cmd>Trouble qflist toggle<cr>", { desc = "Quickfix List (Trouble)" })
+-- Navigate the open Trouble view, falling back to quickfix and reporting invalid jumps.
 map("n", "[q", function()
   if trouble.is_open() then
     trouble.prev({ skip_groups = true, jump = true })
@@ -208,6 +225,7 @@ map("n", "]q", function()
   end
 end, { desc = "Next Trouble / Quickfix Item" })
 
+-- Highlight TODO-style comments and expose navigation, Trouble views and Snacks searches.
 local todo = require("todo-comments")
 todo.setup({})
 map("n", "]t", function()

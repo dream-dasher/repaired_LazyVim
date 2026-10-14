@@ -6,8 +6,10 @@
 -- Foundry: https://getfoundry.sh/
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 
+-- Enable Solidity language support using the installed server definition.
 vim.lsp.config("solidity_ls", {})
 vim.lsp.enable({ "solidity_ls" })
 
+-- Format Solidity with Foundry's forge fmt through Conform.
 local conform = require("conform")
 conform.formatters_by_ft["solidity"] = { "forge_fmt" }

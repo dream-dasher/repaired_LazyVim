@@ -12,15 +12,18 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 -- Package installation: git via native vim.pack.
 
+-- Pair Ruby LSP language features with RuboCop diagnostics/actions.
 vim.lsp.config("ruby_lsp", {})
 vim.lsp.config("rubocop", {})
 vim.lsp.enable({ "ruby_lsp", "rubocop" })
 -- Alternative: replace ruby_lsp with solargraph and remove rubocop from enable().
 -- Solargraph calls RuboCop itself; starting rubocop too duplicates diagnostics.
 -- Alternative formatter: replace rubocop below with standardrb (gem standard).
+-- Format Ruby and ERB with their external CLI tools through Conform.
 local conform = require("conform")
 conform.formatters_by_ft.ruby = { "rubocop" }
 conform.formatters_by_ft.eruby = { "erb_format" }
+-- Load Ruby debugging helpers only when the optional DAP module is available.
 if pcall(require, "dap") then
   vim.pack.add({ { src = "https://github.com/suketa/nvim-dap-ruby" } })
   require("dap-ruby").setup()
