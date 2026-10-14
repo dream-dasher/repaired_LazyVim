@@ -4,6 +4,9 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 local M = {}
 
+--- Return whether automatic formatting is enabled for this buffer.
+--- A buffer override takes precedence over the global setting.
+--- Unset settings mean enabled; nil or 0 selects the current buffer.
 ---@param buf? integer
 ---@return boolean
 function M.enabled(buf)
@@ -15,7 +18,9 @@ function M.enabled(buf)
   return enabled ~= false
 end
 
--- No buffer means a global toggle; 0 means the current buffer's override.
+--- Toggle automatic formatting and report the new setting in a notification.
+--- nil toggles the global setting; a buffer number sets a local override.
+--- Use 0 for the current buffer. A global toggle preserves buffer overrides.
 ---@param buf? integer
 function M.toggle(buf)
   if buf == nil then
@@ -27,6 +32,8 @@ function M.toggle(buf)
   end
 end
 
+--- Format through Conform, targeting the current buffer unless opts overrides it.
+--- This explicit request runs regardless of the automatic-formatting setting.
 ---@param opts? conform.FormatOpts
 function M.format(opts)
   return require("conform").format(vim.tbl_extend("force", { bufnr = 0 }, opts or {}))

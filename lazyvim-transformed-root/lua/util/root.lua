@@ -3,10 +3,16 @@
 -- Derived from LazyVim; modified for standalone Neovim 0.12.6 (Apache-2.0).
 local M = {}
 
+--- Resolve symlinks when possible, then normalize the path's spelling.
+--- Normalize the supplied path even when realpath resolution fails.
 local function normalize(path)
   return vim.fs.normalize(vim.uv.fs_realpath(path) or path)
 end
 
+--- Find the project root for a buffer; nil or 0 selects the current buffer.
+--- Prefer the deepest containing root or workspace from an attached LSP client,
+--- excluding Copilot. Otherwise search upward for .git, .jj, or lua, then use cwd.
+--- For unnamed buffers, use cwd as the starting path.
 ---@param buf? integer
 ---@return string
 function M.get(buf)
@@ -40,6 +46,9 @@ function M.get(buf)
   return roots[1] or vim.fs.root(path, { ".git", ".jj", "lua" }) or normalize(vim.uv.cwd() or ".")
 end
 
+--- Find the Git root at or above the buffer's project root.
+--- Fall back to the project root if no .git marker is found.
+--- nil or 0 selects the current buffer.
 ---@param buf? integer
 ---@return string
 function M.git(buf)
