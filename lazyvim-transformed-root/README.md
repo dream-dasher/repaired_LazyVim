@@ -81,6 +81,8 @@ The default configuration was started with Neovim 0.12.6 against read-only, alre
 
 Focused checks also cover containing-workspace boundaries (including `/`), global versus buffer autoformat overrides, per-buffer lint debouncing, folding state when switching between LSP and Tree-sitter buffers in the same window, and the missing-parser guard that prevents Kulala setup from starting a build. Another isolated check resolves 27 optional configuration modules through native server definitions without launching their commands.
 
+Native first-install confirmation is checked with a status-column redraw before Snacks exists and installation declined. The startup check also renders the column before each plugin addition and verifies that Snacks enables its renderer after setup.
+
 This verifies configuration against those installed plugin versions. Optional plugins, external language servers, debug adapters, project test runners, parser compilation, and fresh network installations require their documented dependencies and have not all been run. See [MIGRATION.md](MIGRATION.md) for behavioral changes and conflicts.
 
 ## Sources and license
